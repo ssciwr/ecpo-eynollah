@@ -1,0 +1,55 @@
+# This section describes the requirements of the build/installation
+# process itself. Being able to do this was the original reason to
+# introduce pyproject.toml
+[build-system]
+requires = [
+    "setuptools >=61",
+]
+build-backend = "setuptools.build_meta"
+
+# This section provides general project metadata that is used across
+# a variety of build tools. Notably, the version specified here is the
+# single source of truth for ecpo_eynollah's version
+[project]
+name = "ecpo_eynollah"
+description = "Tools for applying eynollah to ECPO"
+readme = "README.md"
+maintainers = [
+    { name = "Dominic Kempf", email = "ssc@uni-heidelberg.de" },
+    { name = "Tuyen Le", email = "ssc@uni-heidelberg.de" },
+    { name = "Harald Mack", email = "ssc@uni-heidelberg.de" },
+]
+version = "0.0.1"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "click",
+]
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+    "pytest-cov",
+]
+
+# Command line scripts installed as part of the installation
+[project.scripts]
+ecpo_eynollah = "ecpo_eynollah.__main__:main"
+
+# The following section contains setuptools-specific configuration
+# options. For a full reference of available options, check the overview
+# at https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+[tool.setuptools]
+packages = [
+    "ecpo_eynollah",
+]
+
+# The following is the configuration for the pytest test suite
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
