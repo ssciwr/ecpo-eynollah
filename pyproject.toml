@@ -28,6 +28,10 @@ classifiers = [
 ]
 dependencies = [
     "click",
+    "Pillow",
+    "requests",
+    "svgelements",
+    "tifffile",
 ]
 
 [project.optional-dependencies]
@@ -38,7 +42,7 @@ tests = [
 
 # Command line scripts installed as part of the installation
 [project.scripts]
-ecpo_eynollah = "ecpo_eynollah.__main__:main"
+ecpodata2labelstudio = "ecpo_eynollah.groundtruth:cli"
 
 # The following section contains setuptools-specific configuration
 # options. For a full reference of available options, check the overview
