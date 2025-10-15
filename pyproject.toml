@@ -31,7 +31,6 @@ dependencies = [
     "Pillow",
     "requests",
     "svgelements",
-    "tifffile",
 ]
 
 [project.optional-dependencies]
