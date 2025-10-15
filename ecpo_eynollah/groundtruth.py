@@ -118,10 +118,9 @@ def annotation_to_labelstudio(annotation):
                 "polygonlabels": [label],
             },
             "id": target["id"],
-            "from_name": "tag",
-            "to_name": "img",
+            "from_name": "label",
+            "to_name": "image",
             "type": "polygonlabels",
-            "origin": "ecpo-data",
         }
 
     # Traverse the combinations of body/target
@@ -158,12 +157,17 @@ def ecpo_data_to_labelstudio(input, output):
 
         # Create the required IIIF URL
         iiif = (
-            iiif_metadata(data["items"][0]["target"][0]["source"])["id"]
+            "http://localhost:7000/"
+            + iiif_metadata(data["items"][0]["target"][0]["source"])["id"]
             + "/full/full/0/default.jpg"
         )
 
         tasks.append(
-            {"id": i, "data": {"image": iiif}, "annotations": [{"result": annotations}]}
+            {
+                "id": i,
+                "data": {"image": iiif, "name": filename.stem},
+                "annotations": [{"result": annotations}],
+            }
         )
 
     with open(pathlib.Path(output), "w") as f:
