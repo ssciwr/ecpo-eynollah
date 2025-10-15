@@ -1,0 +1,13 @@
+<View>
+
+  <Header value="Labelling $name (select label and click the image to start)"/>
+  <Image name="image" value="$image" zoom="true"/>
+
+  <PolygonLabels name="label" toName="image">
+    <Label value="image" background="#3498DB"/>
+    <Label value="article" background="#E74C3C"/>
+    <Label value="advertisement" background="#2ECC71"/>
+    <Label value="additional" background="#F1C40F"/>
+  </PolygonLabels>
+
+</View>

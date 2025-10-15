@@ -202,7 +202,7 @@ def ecpo_data_to_labelstudio(input, output):
         resolve_path=True,
         path_type=pathlib.Path,
     ),
-    default="labelstudio.json",
+    default="labelstudio/labelstudio.json",
     help="Where to write the LabelStudio output. Must be a directory.",
 )
 @click.command
@@ -213,5 +213,5 @@ def cli(input, output):
 if __name__ == "__main__":
     ecpo_data_to_labelstudio(
         pathlib.Path("../ecpo-data/data/annotator_data/JB-visualGT/"),
-        pathlib.Path("labelstudio_data.json"),
+        pathlib.Path("labelstudio/labelstudio_data.json"),
     )

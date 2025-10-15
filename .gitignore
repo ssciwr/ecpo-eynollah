@@ -1,4 +1,4 @@
-labelstudio_data
+labelstudio/labelstudio.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
