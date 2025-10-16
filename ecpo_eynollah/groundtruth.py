@@ -172,7 +172,7 @@ def ecpo_data_to_labelstudio(input, output):
             {
                 "id": i,
                 "data": {"image": iiif, "name": filename.stem},
-                "annotations": [{"result": annotations}],
+                "predictions": [{"result": annotations}],
             }
         )
 
