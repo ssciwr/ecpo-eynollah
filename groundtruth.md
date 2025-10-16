@@ -27,8 +27,7 @@ they do not match and it is interesting to study these to maybe get additional i
 * `article` + `image`: This typically indicates that a calligraphic heading. They annotated
   these as `image` with the reasoning being that OCR will not be able to read it because
   of the calligraphic nature. In a different labelling pass, it was labelled as article though.
-* `image` + `advertisement`: Can be safely ignored, because `advertisement` is later deleted
-  and `image` is correct on this, because it is sometimes used for images contained in ads.
+* `image` + `advertisement`: These are images contained in ads or ads mostly composed of an image.
 * `additional` + other: These are only a few, that I have not seen visually.
 
 Note: sometimes there are even triple labels, but they always contain a duplicate pair.
@@ -68,11 +67,12 @@ We explicitly perform these modifications to the data:
 * All double labellings with equal label are deduplicated by removing one annotation
 * Duplicate labels with differing labels are mapped in the following way:
   * `image` + `article` -> `heading`
+  * `image` + `advertisement` -> `image`
   * `additional` + something -> `text`
 * Labels are renamed according to these rules:
   * `additional` -> `text`: All marginalia are text snippets at the end of the day.
   * `article` -> `text`
-  * `advertisement` -> `text`: All image parts of advertisement will need to be labelled manually.
+  * `advertisement` -> `text`: Advertisements are text more often than image, so we use this as a baseline to correct.
 
 ### Step 2: Labelling in LabelStudio
 

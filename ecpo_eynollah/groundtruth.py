@@ -53,12 +53,6 @@ def iiif_metadata(url):
 def modify_annotations_for_eynollah(annotations):
     """Apply our modifications to the ecpo_data"""
 
-    # First drop all annotations that we intend to drop
-    dropped_labels = ["advertisement"]
-    annotations = [
-        a for a in annotations if a["value"]["labels"][0] not in dropped_labels
-    ]
-
     # Analyse duplications of labels
     id_to_labels = {}
     for annot in annotations:
@@ -93,6 +87,24 @@ def modify_annotations_for_eynollah(annotations):
 
             if "additional" in id_to_labels[annot["id"]]:
                 annot["value"]["labels"][0] = "text"
+                id_to_labels[annot["id"]].clear()
+                result.append(annot)
+                continue
+
+            if (
+                "image" in id_to_labels[annot["id"]]
+                and "advertisement" in id_to_labels[annot["id"]]
+            ):
+                annot["value"]["labels"][0] = "image"
+                id_to_labels[annot["id"]].clear()
+                result.append(annot)
+                continue
+
+            if (
+                "article" in id_to_labels[annot["id"]]
+                and "advertisement" in id_to_labels[annot["id"]]
+            ):
+                annot["value"]["labels"][0] = "article"
                 id_to_labels[annot["id"]].clear()
                 result.append(annot)
                 continue
