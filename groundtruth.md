@@ -2,7 +2,8 @@
 
 This document tries to layout our full strategy regarding the handling of ground truth.
 It is written down in order to identify any caveats before we start editing anything.
-Otherwise, we might end up with annotation information being lost or very hard to transfer.
+Otherwise, we might end up with wasted work or additional work required to transfer
+valueable manual annotations.
 
 ## What we have currently
 
@@ -71,7 +72,7 @@ We explicitly perform these modifications to the data:
 * Labels are renamed according to these rules:
   * `additional` -> `text`: All marginalia are text snippets at the end of the day.
   * `article` -> `text`
-  * Remove `advertisement`, these need to be relabelled.
+  * `advertisement` -> `text`: All image parts of advertisement will need to be labelled manually.
 
 ### Step 2: Labelling in LabelStudio
 
@@ -85,11 +86,21 @@ Existing annotations are added as *predictions*, not *annotations* - meaning tha
 start annotating they are all there for you to correct, but only once you hit submit it
 is changed to an *annotation*.
 
+In a first sweep over the data, we will omit the `separator` label, as it is rather easy
+to add in a second sweep. This will allow us to get some more insight before we do the
+tedious work of labelling the very many separators we have.
+
+For ease of use, it is possible to have overlapping labels. We define the following priority
+for the labels (high to low):
+* `separator`
+* `heading`
+* `image`
+* `text`
+In step 3, this priority order will be used to disambiguate overlapping annotations.
+
 We should follow this check-list for labelling:
 
 * [ ] Are there headings that are mislabelled as article?
-* [ ] Label everything in advertisement sections correctly
-* [ ] Mark all separators (rectangles faster?)
 * [ ] Are all images actual images or are some headings?
 
 ### Step 3: Exporting from LabelStudio to Eynollah

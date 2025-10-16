@@ -104,10 +104,8 @@ def modify_annotations_for_eynollah(annotations):
             annot["value"]["labels"][0] = "text"
         if annot["value"]["labels"][0] == "additional":
             annot["value"]["labels"][0] = "text"
-
-        # Drop labels
         if annot["value"]["labels"][0] == "advertisement":
-            continue
+            annot["value"]["labels"][0] = "text"
 
         result.append(annot)
 
