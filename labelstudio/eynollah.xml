@@ -5,9 +5,9 @@
 
   <Labels name="label" toName="image">
     <Label value="image" background="#3498DB"/>
-    <Label value="article" background="#E74C3C"/>
-    <Label value="additional" background="#E67E22"/>
-    <Label value="advertisement" background="#9B59B6"/>
+    <Label value="text" background="#E74C3C"/>
+    <Label value="heading" background="#E67E22"/>
+    <Label value="separator" background="#9B59B6"/>
   </Labels>
 
   <Polygon name="plabel" toName="image" />

@@ -50,6 +50,70 @@ def iiif_metadata(url):
     return requests.get(info_url, timeout=5).json()
 
 
+def modify_annotations_for_eynollah(annotations):
+    """Apply our modifications to the ecpo_data"""
+
+    # First drop all annotations that we intend to drop
+    dropped_labels = ["advertisement"]
+    annotations = [
+        a for a in annotations if a["value"]["labels"][0] not in dropped_labels
+    ]
+
+    # Analyse duplications of labels
+    id_to_labels = {}
+    for annot in annotations:
+        id_to_labels.setdefault(annot["id"], [])
+        id_to_labels[annot["id"]].append(annot["value"]["labels"][0])
+
+    # Whitelist the annotations that we want to keep
+    result = []
+    for annot in annotations:
+        # This was already handled!
+        if len(id_to_labels[annot["id"]]) == 0:
+            continue
+
+        # We have more than one label!
+        if len(id_to_labels[annot["id"]]) > 1:
+            # Is it the same label? We remove one label from
+            # our dictionary and continue. The next occurence
+            # will add it to the result
+            if len(set(id_to_labels[annot["id"]])) == 1:
+                id_to_labels[annot["id"]].remove(annot["value"]["labels"][0])
+                continue
+
+            # Treat special case: image + article -> heading
+            if (
+                "image" in id_to_labels[annot["id"]]
+                and "article" in id_to_labels[annot["id"]]
+            ):
+                annot["value"]["labels"][0] = "heading"
+                id_to_labels[annot["id"]].clear()
+                result.append(annot)
+                continue
+
+            if "additional" in id_to_labels[annot["id"]]:
+                annot["value"]["labels"][0] = "text"
+                id_to_labels[annot["id"]].clear()
+                result.append(annot)
+                continue
+
+            print(f"Unhandled pair of two labels: {id_to_labels[annot['id']]}")
+
+        # Rename labels
+        if annot["value"]["labels"][0] == "article":
+            annot["value"]["labels"][0] = "text"
+        if annot["value"]["labels"][0] == "additional":
+            annot["value"]["labels"][0] = "text"
+
+        # Drop labels
+        if annot["value"]["labels"][0] == "advertisement":
+            continue
+
+        result.append(annot)
+
+    return result
+
+
 def annotation_to_labelstudio(annotation):
     """Translates a single annotation from ecpo-annotate to LabelStudio"""
 
@@ -146,7 +210,7 @@ def image_annotations_to_labelstudio(data):
     return annotations
 
 
-def ecpo_data_to_labelstudio(input, output):
+def ecpo_data_to_labelstudio(input, output, modify):
     # Find all valid JSON files in the input
     json_files = list(filter(_is_data_json, pathlib.Path(input).rglob("*.json")))
 
@@ -160,6 +224,10 @@ def ecpo_data_to_labelstudio(input, output):
 
         # Get all annotations from this JSON file
         annotations = image_annotations_to_labelstudio(data)
+
+        # Maybe modify the annotations:
+        if modify:
+            annotations = modify_annotations_for_eynollah(annotations)
 
         # Create the required IIIF URL
         iiif = (
@@ -205,13 +273,20 @@ def ecpo_data_to_labelstudio(input, output):
     default="labelstudio/labelstudio.json",
     help="Where to write the LabelStudio output. Must be a directory.",
 )
+@click.option(
+    "--modify/--no-modify",
+    type=bool,
+    default=False,
+    help="Whether to modify annotations for eynollah",
+)
 @click.command
-def cli(input, output):
-    ecpo_data_to_labelstudio(input, output)
+def cli(input, output, modify):
+    ecpo_data_to_labelstudio(input, output, modify)
 
 
 if __name__ == "__main__":
     ecpo_data_to_labelstudio(
         pathlib.Path("../ecpo-data/data/annotator_data/JB-visualGT/"),
         pathlib.Path("labelstudio/labelstudio_data.json"),
+        True,
     )
