@@ -114,7 +114,7 @@ def annotation_to_labelstudio(annotation):
                 "value": {
                     "points": points,
                     "closed": True,
-                    "polygonlabels": [label],
+                    "labels": [label],
                 },
                 "id": target["id"],
                 "from_name": "label",
