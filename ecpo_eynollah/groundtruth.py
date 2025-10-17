@@ -210,7 +210,6 @@ def annotation_to_labelstudio(annotation):
             return
 
         if isinstance(svg, svgelements.Circle):
-            print(target["source"])
             config["value"] = {
                 "x": svg.cx / width * 100.0,
                 "y": svg.cy / height * 100.0,
