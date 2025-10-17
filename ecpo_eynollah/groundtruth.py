@@ -172,6 +172,19 @@ def annotation_to_labelstudio(annotation):
         height = metadata["height"]
 
         #
+        # Create the config for this annotation
+        #
+
+        config = {
+            "original_width": width,
+            "original_height": height,
+            "image_rotation": 0,
+            "id": target["id"],
+            "from_name": "label",
+            "to_name": "image",
+        }
+
+        #
         # Convert the SVG selector to global coordinates
         #
 
@@ -186,24 +199,29 @@ def annotation_to_labelstudio(annotation):
             # a percentage of the original size as data representation.
             points = [[p.x / width * 100.0, p.y / height * 100.0] for p in svg]
 
-            yield {
-                "original_width": width,
-                "original_height": height,
-                "image_rotation": 0,
-                "value": {
-                    "points": points,
-                    "closed": True,
-                    "labels": [label],
-                },
-                "id": target["id"],
-                "from_name": "label",
-                "to_name": "image",
-                "type": "polygonlabels",
+            config["value"] = {
+                "points": points,
+                "closed": True,
+                "labels": [label],
             }
+            config["type"] = "polygonlabels"
+
+            yield config
             return
 
         if isinstance(svg, svgelements.Circle):
-            print("Circle found")
+            print(target["source"])
+            config["value"] = {
+                "x": svg.cx / width * 100.0,
+                "y": svg.cy / height * 100.0,
+                "radiusX": svg.rx / width * 100.0,
+                "radiusY": svg.ry / height * 100.0,
+                "rotation": 0,
+                "labels": [label],
+            }
+            config["type"] = "ellipse"
+
+            yield config
             return
 
         print(f"Omitting SVG element of type {type(svg)}")
