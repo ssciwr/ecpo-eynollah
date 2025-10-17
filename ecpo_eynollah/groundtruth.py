@@ -8,6 +8,7 @@ import pathlib
 import requests
 import svgelements
 
+from PIL import Image, ImageDraw
 from urllib.parse import unquote
 
 
@@ -36,6 +37,10 @@ def iiif_metadata(url):
     """Access IIIF metadata for the given URL. Also corrects the URL from
     old server in the ecpo-data repository to the currently running one.
     """
+    # If this contains a cors-anywhere prefix, we omit it, because these URLs
+    # *only* work from inside the browser.
+    url = url.replace("http://localhost:7000/", "")
+
     # Create a live URL for use with LabelStudio without duplicating the
     # data on our LabelStudio VM.
     old_iiif = _recursive_unquote(url)
@@ -258,6 +263,60 @@ def ecpo_data_to_labelstudio(input, output, modify):
         json.dump(tasks, f)
 
 
+def labelstudio_to_png(input, output, color):
+    """Create PNGs from LabelStudio annotations"""
+
+    # Define the label priority from low to high. This is used to resolve
+    # overlapping annotations gracefully.
+    label_priority = [
+        "text",
+        "image",
+        "heading",
+        "separator",
+    ]
+
+    mode = "RGB" if color else "L"
+    background = (0, 0, 0) if color else 0
+    colormap = {
+        "text": (231, 76, 60) if color else 1,
+        "image": (52, 152, 219) if color else 2,
+        "heading": (230, 126, 34) if color else 3,
+        "separator": (155, 89, 182) if color else 4,
+    }
+
+    # Read the exported data
+    with open(input, "r") as f:
+        data = json.load(f)
+
+    for task in data:
+        # Get the image size and instantiate an empty image
+        metadata = iiif_metadata(task["image"])
+        image = Image.new(mode, (metadata["width"], metadata["height"]), background)
+
+        # Create a drawing context
+        draw = ImageDraw.Draw(image)
+
+        def _percentage_to_pixels(coord):
+            return (
+                coord[0] / 100 * metadata["width"],
+                coord[1] / 100 * metadata["height"],
+            )
+
+        for label in label_priority:
+            for annotation in task["label"]:
+                if annotation["labels"][0] != label:
+                    continue
+
+                draw.polygon(
+                    [_percentage_to_pixels(c) for c in annotation["points"]],
+                    fill=colormap[annotation["labels"][0]],
+                )
+
+        # Create output path
+        filename = output / f"{task['name']}.png"
+        image.save(filename, "PNG")
+
+
 @click.option(
     "--input",
     type=click.Path(
@@ -290,8 +349,44 @@ def ecpo_data_to_labelstudio(input, output, modify):
     help="Whether to modify annotations for eynollah",
 )
 @click.command
-def cli(input, output, modify):
+def ecpo_data_to_labelstudio_cli(input, output, modify):
     ecpo_data_to_labelstudio(input, output, modify)
+
+
+@click.option(
+    "--input",
+    type=click.Path(
+        writable=False,
+        file_okay=True,
+        dir_okay=False,
+        exists=True,
+        resolve_path=True,
+        path_type=pathlib.Path,
+    ),
+    help="The JSON-MIN export from LabelStudio",
+)
+@click.option(
+    "--output",
+    type=click.Path(
+        writable=True,
+        file_okay=False,
+        dir_okay=True,
+        resolve_path=True,
+        path_type=pathlib.Path,
+    ),
+    default="labelstudio/png_output",
+    help="The directory where PNG output is placed",
+)
+@click.option(
+    "--color/--no-color",
+    type=bool,
+    default=False,
+    help="Whether to make this colorful (mainly for debugging and visualization)",
+)
+@click.command
+def labelstudio_to_png_cli(input, output, color):
+    output.mkdir(exist_ok=True, parents=True)
+    labelstudio_to_png(input, output, color)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,6 @@
+labelstudio/export.json
 labelstudio/labelstudio.json
+labelstudio/png_output
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
