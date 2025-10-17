@@ -68,6 +68,7 @@ We explicitly perform these modifications to the data:
 * Duplicate labels with differing labels are mapped in the following way:
   * `image` + `article` -> `heading`
   * `image` + `advertisement` -> `image`
+  * `article` + `advertisement` -> `article`
   * `additional` + something -> `text`
 * Labels are renamed according to these rules:
   * `additional` -> `text`: All marginalia are text snippets at the end of the day.
