@@ -333,10 +333,40 @@ def labelstudio_to_png(input, output, color):
                 if annotation["labels"][0] != label:
                     continue
 
-                draw.polygon(
-                    [_percentage_to_pixels(c) for c in annotation["points"]],
-                    fill=colormap[annotation["labels"][0]],
-                )
+                # This is a polygon
+                if "points" in annotation:
+                    draw.polygon(
+                        [_percentage_to_pixels(c) for c in annotation["points"]],
+                        fill=colormap[annotation["labels"][0]],
+                    )
+
+                # This is an ellipse
+                if "radiusX" in annotation:
+                    center = _percentage_to_pixels((annotation["x"], annotation["y"]))
+                    radius = _percentage_to_pixels(
+                        (annotation["radiusX"], annotation["radiusY"])
+                    )
+                    bbox = [
+                        center[0] - radius[0],
+                        center[1] - radius[1],
+                        center[0] + radius[0],
+                        center[1] + radius[1],
+                    ]
+                    draw.ellipse(bbox, fill=colormap[annotation["labels"][0]])
+
+                # This is a rectangle
+                if "width" in annotation:
+                    center = _percentage_to_pixels((annotation["x"], annotation["y"]))
+                    size = _percentage_to_pixels(
+                        (annotation["width"], annotation["height"])
+                    )
+                    bbox = [
+                        center[0] - size[0] / 2,
+                        center[1] - size[1] / 2,
+                        center[0] + size[0] / 2,
+                        center[1] + size[1] / 2,
+                    ]
+                    draw.rectangle(bbox, fill=colormap[annotation["labels"][0]])
 
         # Create output path
         filename = output / f"{task['name']}.png"
