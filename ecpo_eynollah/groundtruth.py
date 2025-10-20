@@ -297,18 +297,24 @@ def labelstudio_to_png(input, output, color):
     # overlapping annotations gracefully.
     label_priority = [
         "text",
+        "advertisement",
         "image",
         "heading",
         "separator",
+        "additional",
+        "article",
     ]
 
     mode = "RGB" if color else "L"
     background = (0, 0, 0) if color else 0
     colormap = {
         "text": (231, 76, 60) if color else 1,
+        "article": (231, 76, 60) if color else 1,
         "image": (52, 152, 219) if color else 2,
         "heading": (230, 126, 34) if color else 3,
         "separator": (155, 89, 182) if color else 4,
+        "advertisement": (46, 204, 113) if color else 5,
+        "additional": (52, 73, 94) if color else 6,
     }
 
     # Read the exported data
