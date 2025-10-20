@@ -2,8 +2,6 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ssciwr/ecpo-eynollah/ci.yml?branch=main)](https://github.com/ssciwr/ecpo-eynollah/actions/workflows/ci.yml)
-[![Documentation Status](https://readthedocs.org/projects/ecpo-eynollah/badge/)](https://ecpo-eynollah.readthedocs.io/)
-[![codecov](https://codecov.io/gh/ssciwr/ecpo-eynollah/branch/main/graph/badge.svg)](https://codecov.io/gh/ssciwr/ecpo-eynollah)
 
 ## Installation
 
