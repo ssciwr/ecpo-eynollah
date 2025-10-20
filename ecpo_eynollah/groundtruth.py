@@ -8,6 +8,7 @@ import json
 import pathlib
 import requests
 import svgelements
+import tqdm
 
 from PIL import Image, ImageDraw
 from urllib.parse import unquote
@@ -253,7 +254,7 @@ def ecpo_data_to_labelstudio(
     tasks = []
 
     # Iterate over the JSONs
-    for i, filename in enumerate(json_files):
+    for i, filename in tqdm.tqdm(enumerate(json_files)):
         with open(filename, "r") as f:
             data = json.load(f)
 
@@ -314,7 +315,7 @@ def labelstudio_to_png(input, output, color):
     with open(input, "r") as f:
         data = json.load(f)
 
-    for task in data:
+    for task in tqdm.tqdm(data):
         # Get the image size and instantiate an empty image
         metadata = iiif_metadata(task["image"])
         image = Image.new(mode, (metadata["width"], metadata["height"]), background)
