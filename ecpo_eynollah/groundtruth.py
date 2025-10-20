@@ -1,5 +1,6 @@
 """Massaging of existing ground truth into desired formats """
 
+import re
 import click
 import functools
 import io
@@ -39,7 +40,7 @@ def iiif_metadata(url):
     """
     # If this contains a cors-anywhere prefix, we omit it, because these URLs
     # *only* work from inside the browser.
-    url = url.replace("http://localhost:7000/", "")
+    url = re.sub(r"http://localhost:[0-9]*/", "", url)
 
     # Create a live URL for use with LabelStudio without duplicating the
     # data on our LabelStudio VM.
@@ -242,7 +243,7 @@ def image_annotations_to_labelstudio(data):
     return annotations
 
 
-def ecpo_data_to_labelstudio(input, output, modify):
+def ecpo_data_to_labelstudio(input, output, modify, cors_anywhere_port=None):
     # Find all valid JSON files in the input
     json_files = list(filter(_is_data_json, pathlib.Path(input).rglob("*.json")))
 
@@ -261,9 +262,13 @@ def ecpo_data_to_labelstudio(input, output, modify):
         if modify:
             annotations = modify_annotations_for_eynollah(annotations)
 
+        cors_proxy = ""
+        if cors_anywhere_port is not None:
+            cors_proxy = f"http://localhost:{cors_anywhere_port}/"
+
         # Create the required IIIF URL
         iiif = (
-            "http://localhost:7000/"
+            cors_proxy
             + iiif_metadata(data["items"][0]["target"][0]["source"])["id"]
             + "/full/full/0/default.jpg"
         )
@@ -365,9 +370,15 @@ def labelstudio_to_png(input, output, color):
     default=False,
     help="Whether to modify annotations for eynollah",
 )
+@click.option(
+    "--cors-anywhere-port",
+    type=int,
+    default=None,
+    help="The port of a local cors-anywhere server to prefix IIIF URLs with",
+)
 @click.command
-def ecpo_data_to_labelstudio_cli(input, output, modify):
-    ecpo_data_to_labelstudio(input, output, modify)
+def ecpo_data_to_labelstudio_cli(input, output, modify, cors_anywhere_port):
+    ecpo_data_to_labelstudio(input, output, modify, cors_anywhere_port)
 
 
 @click.option(
