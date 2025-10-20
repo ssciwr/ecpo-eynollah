@@ -243,7 +243,9 @@ def image_annotations_to_labelstudio(data):
     return annotations
 
 
-def ecpo_data_to_labelstudio(input, output, modify, cors_anywhere_port=None):
+def ecpo_data_to_labelstudio(
+    input, output, modify, cors_anywhere_port=None, mark_as_annotations=False
+):
     # Find all valid JSON files in the input
     json_files = list(filter(_is_data_json, pathlib.Path(input).rglob("*.json")))
 
@@ -273,11 +275,13 @@ def ecpo_data_to_labelstudio(input, output, modify, cors_anywhere_port=None):
             + "/full/full/0/default.jpg"
         )
 
+        key = "annotations" if mark_as_annotations else "predictions"
+
         tasks.append(
             {
                 "id": i,
                 "data": {"image": iiif, "name": filename.stem},
-                "predictions": [{"result": annotations}],
+                key: [{"result": annotations}],
             }
         )
 
@@ -376,9 +380,19 @@ def labelstudio_to_png(input, output, color):
     default=None,
     help="The port of a local cors-anywhere server to prefix IIIF URLs with",
 )
+@click.option(
+    "--mark-as-annotations/--no-mark-as-annotations",
+    type=bool,
+    default=False,
+    help="Whether to mark the output as annotations instead of predictions (LabelStudio terminology).",
+)
 @click.command
-def ecpo_data_to_labelstudio_cli(input, output, modify, cors_anywhere_port):
-    ecpo_data_to_labelstudio(input, output, modify, cors_anywhere_port)
+def ecpo_data_to_labelstudio_cli(
+    input, output, modify, cors_anywhere_port, mark_as_annotations
+):
+    ecpo_data_to_labelstudio(
+        input, output, modify, cors_anywhere_port, mark_as_annotations
+    )
 
 
 @click.option(
