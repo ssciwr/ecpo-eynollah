@@ -32,6 +32,8 @@ dependencies = [
     "requests",
     "svgelements",
     "tqdm",
+    "opencv-python",
+    "numpy",
 ]
 
 [project.optional-dependencies]
