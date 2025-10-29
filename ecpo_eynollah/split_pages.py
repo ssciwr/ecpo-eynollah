@@ -24,11 +24,11 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 import argparse
-from datetime import datetime, timezone
 from ecpo_eynollah import config_handler
 from ecpo_eynollah import utils
 from pathlib import Path
 from typing import List
+import shutil
 
 # ----------------------------
 # CONFIG / TUNABLE PARAMETERS
@@ -172,15 +172,19 @@ def find_split_columns(
     _, w = img_rect.shape[:2]
     left = 0
 
-    # convert to black and white morphed image
-    morp = convert_to_binary_morp(
-        img_rect,
-        fname,
-        output_dir,
-        unique_tag,
-        img_quality=img_quality,
-        save_for_debug=save_for_debug,
-    )
+    if kwargs.get("convert_bw", True):
+        # convert to black and white morphed image
+        morp = convert_to_binary_morp(
+            img_rect,
+            fname,
+            output_dir,
+            unique_tag,
+            img_quality=img_quality,
+            save_for_debug=save_for_debug,
+        )
+    else:
+        # use grayscale directly
+        morp = cv2.cvtColor(img_rect, cv2.COLOR_BGR2GRAY)
     if save_for_debug:
         utils.save_jpeg(
             output_dir / f"debug_{fname}_morp_{unique_tag}.jpg",
@@ -310,6 +314,8 @@ def process_folder(config_path: str | None = None, unique_tag: str | None = None
     config_handler.save_config_to_file(
         config, output_dir, file_name=f"used_config_{unique_tag}.json"
     )
+    # save a copy of this script
+    shutil.copy2(Path(__file__), output_dir / f"split_pages_{unique_tag}.py")
 
     # collect all files in input dir
     files = sorted(

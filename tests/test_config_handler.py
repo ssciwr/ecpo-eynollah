@@ -30,6 +30,7 @@ def test_is_valid_config():
     config = {
         "gutter_detection": {
             "output_dir": "./data/out",
+            "convert_bw": True,
             "smooth_kernel": 101,
             "min_distance_between_splits": 1200,
             "min_depth_factor": 0.05,
@@ -46,6 +47,9 @@ def test_is_valid_config():
 
     config = {"gutter_detection": {"output_dir": True}}
     assert config_handler.is_valid_config(config, None) is False
+
+    config = {"convert_bw": "True"}
+    assert config_handler.is_valid_config(config, "gutter_detection") is False
 
     config = {"smooth_kernel": "101"}
     assert config_handler.is_valid_config(config, "gutter_detection") is False
