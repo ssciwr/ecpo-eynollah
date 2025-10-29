@@ -8,6 +8,6 @@
         "min_depth_factor": 0.55,
         "fallback_to_center": true,
         "jpeg_quality": 95,
-        "save_intermediate_images": true
+        "save_intermediate_images": false
     }
 }
