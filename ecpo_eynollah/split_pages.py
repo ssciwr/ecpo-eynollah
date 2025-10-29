@@ -27,7 +27,7 @@ import argparse
 from ecpo_eynollah import config_handler
 from ecpo_eynollah import utils
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 import shutil
 
 # ----------------------------
@@ -145,7 +145,7 @@ def convert_to_binary_morp(
 
 def find_split_columns(
     img_rect: np.ndarray, fname: str, unique_tag: str, **kwargs
-) -> list[int]:
+) -> Tuple[List[int], bool]:
     """Returns a sorted list of x coordinates where splits should occur (columns).
     Return only the split columns (internal cuts).
 
@@ -162,7 +162,7 @@ def find_split_columns(
             save_intermediate_images (bool): whether to save intermediate images for debugging.
 
     Returns:
-        list[int]: List of x columns where splits should occur.
+        Tuple[List[int], bool]: (list of internal split columns, fallback used)
     """
     # config for debug saving
     output_dir = Path(kwargs.get("output_dir", "."))
@@ -223,7 +223,7 @@ def find_split_columns(
     filtered = []
     last = -10000
     for c in candidates_sorted:
-        if c - last >= kwargs.get("min_distance_between_splits", 1200):
+        if c - last >= kwargs.get("min_distance_between_splits", 600):
             filtered.append(c)
             last = c
         else:
@@ -232,12 +232,14 @@ def find_split_columns(
             pass
 
     # If no splits were found, fallback to center split (one internal split)
+    fallback = False
     if len(filtered) == 0 and kwargs.get("fallback_to_center", True):
         mid = w // 2
         filtered = [mid]
+        fallback = True
 
     # Return internal split columns only (not 0 or w)
-    return filtered
+    return filtered, fallback
 
 
 # ----------------------------
@@ -327,6 +329,8 @@ def process_folder(config_path: str | None = None, unique_tag: str | None = None
     )
 
     log_lines = []
+    fallback_count = 0
+    fallback_files = []
     for _, fpath in enumerate(tqdm(files, desc="files")):
         try:
             img = utils.load_image(fpath)
@@ -345,24 +349,38 @@ def process_folder(config_path: str | None = None, unique_tag: str | None = None
             )
 
         # step 2: find splits
-        splits = find_split_columns(
+        splits, fallback = find_split_columns(
             rect, fpath.stem, unique_tag, **gutter_detect_config
         )
+        if fallback:
+            fallback_count += 1
+            fallback_files.append(fpath.name)
 
         # step 3: slice & save
         saved = slice_and_save(rect, splits, output_dir, fpath.stem)
 
         # log
         split_str = ",".join(str(x) for x in splits)
-        log_lines.append(f"{fpath.name}\t{len(saved)}\t{split_str}")
+        log_lines.append(
+            f"{fpath.name}\t{len(saved)}\t{split_str}\t{'x' if fallback else ''}"
+        )
 
     # write log
     with open(
-        os.path.join(output_dir, f"split_log_{unique_tag}.tsv"), "w", encoding="utf8"
+        os.path.join(output_dir, f"split_log_{unique_tag}.csv"), "w", encoding="utf8"
     ) as f:
-        f.write("input_file\tsegments\tsplits_internal\n")
+        f.write("input_file\tsegments\tsplits_internal\tfallback\n")
         for L in log_lines:
             f.write(L + "\n")
+
+    # display summary
+    print(f"Processed {len(files)} files.")
+    print(f"Output saved to: {output_dir}")
+    print(f"Fallback to center split used in {fallback_count} files.")
+    if fallback_count > 0:
+        print("Files with fallback:")
+        for fn in fallback_files:
+            print(f" - {fn}")
 
 
 # ----------------------------
