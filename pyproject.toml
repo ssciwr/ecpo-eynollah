@@ -34,6 +34,7 @@ dependencies = [
     "tqdm",
     "opencv-python",
     "numpy",
+    "jsonschema",
 ]
 
 [project.optional-dependencies]

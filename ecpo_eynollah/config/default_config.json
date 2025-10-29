@@ -1,0 +1,12 @@
+{
+    "input_dir": "./data/in",
+    "gutter_detection": {
+        "output_dir": "./data/out",
+        "smooth_kernel": 101,
+        "min_distance_between_splits": 1200,
+        "min_depth_factor": 0.05,
+        "fallback_to_center": true,
+        "jpeg_quality": 95,
+        "save_intermediate_images": true
+    }
+}
