@@ -246,7 +246,11 @@ def find_split_columns(
 # Step 3: Slice & save
 # ----------------------------
 def slice_and_save(
-    img_rect: np.ndarray, splits_internal: List[int], output_dir: Path, fname: str
+    img_rect: np.ndarray,
+    splits_internal: List[int],
+    output_dir: Path,
+    fname: str,
+    unique_tag: str,
 ):
     """Slice the rectified image at the given split columns and save segments.
     Segments are saved as <fname>_pX.jpg where X is the segment index starting from 0.
@@ -256,6 +260,7 @@ def slice_and_save(
         splits_internal (List[int]): List of internal split columns (x coordinates).
         output_dir (Path): Directory to save the segments.
         fname (str): filename of the image, used for naming output segments.
+        unique_tag (str): unique tag to append to output image filenames.
     """
     _, w = img_rect.shape[:2]
     cuts = [0] + splits_internal + [w]
@@ -272,7 +277,7 @@ def slice_and_save(
         out_img[:, x0:x1] = seg
 
         # save the imgage with only the segment visible
-        outname = f"{fname}_p{i}.jpg"
+        outname = f"{fname}_p{i}_{unique_tag}.jpg"
         outpath = output_dir / outname
         utils.save_jpeg(outpath, out_img, quality=JPEG_QUALITY)
         saved.append((outpath, x0, x1))
@@ -357,7 +362,9 @@ def process_folder(config_path: str | None = None, unique_tag: str | None = None
             fallback_files.append(fpath.name)
 
         # step 3: slice & save
-        saved = slice_and_save(rect, splits, output_dir, fpath.stem)
+        saved = slice_and_save(
+            rect, splits, output_dir, fpath.stem, unique_tag=unique_tag
+        )
 
         # log
         split_str = ",".join(str(x) for x in splits)
