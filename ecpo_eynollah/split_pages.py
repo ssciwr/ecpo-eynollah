@@ -2,7 +2,7 @@
 split_pages.py
 
 Usage:
-    python split_pages.py --config default|config_file.json --tag unique_tag
+    python split_pages.py [--config config_file.json --tag unique_tag]
 
 Notes:
 - For each input image it will:
@@ -54,6 +54,7 @@ JPEG_QUALITY = 95  # it can be a quality from 0 to 100 (the higher is the better
 # Step 1: rotate document and keep size
 # ----------------------------
 def rotate_img(img):
+    # TODO
     pass
 
 
@@ -378,6 +379,7 @@ if __name__ == "__main__":
     )
 
     p.add_argument(
+        "-t",
         "--tag",
         type=str,
         required=False,
