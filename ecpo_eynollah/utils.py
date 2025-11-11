@@ -1,6 +1,6 @@
 from pathlib import Path
 import numpy as np
-import cv2
+from PIL import Image
 from datetime import datetime
 import socket
 
@@ -30,14 +30,11 @@ def load_image(path: Path) -> np.ndarray:
             or if the image cannot be loaded.
     """
     try:
-        data = np.fromfile(path, dtype=np.uint8)
+        img = Image.open(path).convert("RGB")
+        img_array = np.array(img)
     except Exception as e:
-        raise ValueError(f"File path {path} is invalid.") from e
-
-    img = cv2.imdecode(data, cv2.IMREAD_COLOR)
-    if img is None:
-        raise ValueError(f"Could not load image from path: {path}")
-    return img
+        raise ValueError(f"Could not load image from path: {path}, error: {e}")
+    return img_array
 
 
 def save_jpeg(path: Path, img: np.ndarray, quality: int = 95):
@@ -60,26 +57,8 @@ def save_jpeg(path: Path, img: np.ndarray, quality: int = 95):
         ext = ".jpg"
         path = path + ext
 
-    params = (
-        [int(cv2.IMWRITE_JPEG_QUALITY), quality] if ext in [".jpg", ".jpeg"] else []
-    )
-    _, enc = cv2.imencode(ext, img, params)
-
-    enc.tofile(path)
-
-
-def get_img_size(img: np.ndarray) -> tuple[int, int]:
-    """Gets the width and height of the image.
-
-    Args:
-        img (np.ndarray): Image in BGR format (H, W, 3).
-    """
-    invalid_img = img is None or len(img.shape) < 2
-    if invalid_img:
-        raise ValueError("Invalid image provided.")
-
-    h, w = img.shape[:2]
-    return h, w
+    img_pil = Image.fromarray(img)
+    img_pil.save(path, quality=quality)
 
 
 def generate_unique_tag() -> str:
@@ -87,7 +66,7 @@ def generate_unique_tag() -> str:
     This will be used to identify different runs.
 
     Returns:
-        str: A unique tag in the format "YYYYMMDD-HHMMSS_hostname".
+        str: A unique tag in the format "ts{YYYYMMDD-HHMMSS}_h{hostname}".
     """
     now = datetime.now()
     timestamp = now.strftime("%Y%m%d-%H%M%S")

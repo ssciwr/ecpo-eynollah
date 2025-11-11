@@ -30,13 +30,14 @@ def test_is_valid_config():
     config = {
         "gutter_detection": {
             "output_dir": "./data/out",
-            "convert_bw": True,
-            "smooth_kernel": 101,
-            "min_distance_between_splits": 1200,
-            "min_depth_factor": 0.05,
+            "ocr_model": "PP-OCRv5_server_det",
+            "device": "cpu",
+            "proj_func": "mean",
+            "number_breakpoints": 4,
+            "close_threshold": 0.001,
             "fallback_to_center": True,
+            "num_segments": 2,
             "jpeg_quality": 95,
-            "save_intermediate_images": True,
         }
     }
     assert config_handler.is_valid_config(config, None) is True
@@ -48,31 +49,38 @@ def test_is_valid_config():
     config = {"gutter_detection": {"output_dir": True}}
     assert config_handler.is_valid_config(config, None) is False
 
-    config = {"convert_bw": "True"}
+    config = {"ocr_model": True}
     assert config_handler.is_valid_config(config, "gutter_detection") is False
 
-    config = {"smooth_kernel": "101"}
-    assert config_handler.is_valid_config(config, "gutter_detection") is False
-    config = {"smooth_kernel": 100}  # must be odd
+    config = {"device": 1}
     assert config_handler.is_valid_config(config, "gutter_detection") is False
 
-    config = {"min_distance_between_splits": "1200"}
+    config = {"proj_func": "invalid"}
+    assert config_handler.is_valid_config(config, "gutter_detection") is False
+    config = {"proj_func": 1}
     assert config_handler.is_valid_config(config, "gutter_detection") is False
 
-    config = {"min_depth_factor": "0.05"}
+    config = {"number_breakpoints": "4"}
     assert config_handler.is_valid_config(config, "gutter_detection") is False
-    config = {"min_depth_factor": 1.5}
+    config = {"number_breakpoints": 0}
+    assert config_handler.is_valid_config(config, "gutter_detection") is False
+
+    config = {"close_threshold": "0.001"}
+    assert config_handler.is_valid_config(config, "gutter_detection") is False
+    config = {"close_threshold": -0.1}
     assert config_handler.is_valid_config(config, "gutter_detection") is False
 
     config = {"fallback_to_center": "True"}
     assert config_handler.is_valid_config(config, "gutter_detection") is False
 
+    config = {"num_segments": "2"}
+    assert config_handler.is_valid_config(config, "gutter_detection") is False
+    config = {"num_segments": 0}
+    assert config_handler.is_valid_config(config, "gutter_detection") is False
+
     config = {"jpeg_quality": "95"}
     assert config_handler.is_valid_config(config, "gutter_detection") is False
     config = {"jpeg_quality": 150}
-    assert config_handler.is_valid_config(config, "gutter_detection") is False
-
-    config = {"save_intermediate_images": "True"}
     assert config_handler.is_valid_config(config, "gutter_detection") is False
 
 
@@ -100,7 +108,7 @@ def test_update_new_config_not_updated():
     assert updated is False
     with pytest.warns(UserWarning):
         updated = config_handler._update_new_config(
-            {"smooth_kernel": 21}, {"smooth_kernel": 20}, parent_key="gutter_detection"
+            {"ocr_model": 21}, {"ocr_model": 20}, parent_key="gutter_detection"
         )
     assert updated is False
 
@@ -110,8 +118,8 @@ def test_update_new_config_not_updated():
     )
     assert updated is False
     updated = config_handler._update_new_config(
-        {"gutter_detection": {"save_intermediate_images": True}},
-        {"gutter_detection": {"save_intermediate_images": True}},
+        {"gutter_detection": {"fallback_to_center": True}},
+        {"gutter_detection": {"fallback_to_center": True}},
         parent_key=None,
     )
     assert updated is False
@@ -194,7 +202,7 @@ def test_load_config_file(tmp_path):
         f.write("test")
     with pytest.warns(UserWarning):
         config, fname = config_handler.load_config(config_path, new_config=None)
-    assert config.get("gutter_detection").get("smooth_kernel") == 101
+    assert config.get("gutter_detection").get("number_breakpoints") == 4
     assert fname == "default_config"
 
     # invalid json file against the schema

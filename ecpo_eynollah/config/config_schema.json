@@ -12,36 +12,47 @@
             "properties": {
                 "output_dir": {
                     "type": "string",
-                    "default": "./data/out",
+                    "default": "./data/out/pagesplit",
                     "description": "Directory to save output images of gutter detection."
                 },
-                "convert_bw": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Whether to convert images to black and white before processing."
+                "ocr_model": {
+                    "type": "string",
+                    "default": "PP-OCRv5_server_det",
+                    "description": "PaddleOCR model name for text detection."
                 },
-                "smooth_kernel": {
+                "device": {
+                    "type": "string",
+                    "default": "cpu",
+                    "description": "Device to run the OCR model on. e.g. 'cpu', 'gpu', 'gpu:0'."
+                },
+                "proj_func": {
+                    "type": "string",
+                    "enum": ["mean", "max", "min", "sum"],
+                    "default": "mean",
+                    "description": "Projection function to use for gutter detection."
+                },
+                "number_breakpoints": {
                     "type": "integer",
-                    "default": 51,
-                    "not": {"multipleOf": 2},
-                    "description": "Kernel width (in pixels) for 1D smoothing of column sums. Must be odd; increase if noisy."
+                    "minimum": 1,
+                    "default": 4,
+                    "description": "Number of breakpoints (splits) to detect using Dynamic Programming."
                 },
-                "min_distance_between_splits": {
-                    "type": "integer",
-                    "default": 600,
-                    "description": "Minimum allowed distance between splits, in pixels."
-                },
-                "min_depth_factor": {
+                "close_threshold": {
                     "type": "number",
                     "minimum": 0.0,
-                    "maximum": 1.0,
-                    "default": 0.55,
-                    "description": "Minima must be this fraction below median projection to qualify"
+                    "default": 0.001,
+                    "description": "Threshold to consider a value close to 'almost gutter'."
                 },
                 "fallback_to_center": {
                     "type": "boolean",
                     "default": true,
                     "description": "If no minima detected, whether to fallback to a single center split (two pages)"
+                },
+                "num_segments": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 2,
+                    "description": "Number of segments (pages) to split the image into."
                 },
                 "jpeg_quality": {
                     "type": "integer",
@@ -49,11 +60,6 @@
                     "maximum": 100,
                     "default": 95,
                     "description": "JPEG quality for saved images."
-                },
-                "save_intermediate_images": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Whether to save intermediate images used for debugging."
                 }
             }
         }

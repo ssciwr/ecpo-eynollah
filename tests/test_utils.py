@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 from ecpo_eynollah import utils
 import numpy as np
-import cv2
+from PIL import Image
 
 
 def test_ensure_dir(tmp_path):
@@ -17,7 +17,8 @@ def test_load_image(tmp_path):
     # Create a simple image and save it
     img_path = tmp_path / "test_image.jpg"
     img = 255 * np.ones((100, 100, 3), dtype=np.uint8)
-    cv2.imwrite(str(img_path), img)
+    img_pil = Image.fromarray(img)
+    img_pil.save(img_path)
 
     # Load the image using the utility function
     loaded_img = utils.load_image(img_path)
@@ -50,23 +51,10 @@ def test_save_jpeg(tmp_path):
     utils.save_jpeg(save_path, img, quality=90)
     assert save_path.exists()
 
-    loaded_img = cv2.imread(str(save_path))
+    loaded_img = Image.open(save_path)
+    loaded_img = np.array(loaded_img)
     assert loaded_img.shape == (100, 100, 3)
     assert np.array_equal(loaded_img, img)
-
-
-def test_get_img_size():
-    # valid image
-    img = 255 * np.ones((200, 150, 3), dtype=np.uint8)
-    h, w = utils.get_img_size(img)
-    assert h == 200
-    assert w == 150
-
-    # invalid image
-    with pytest.raises(ValueError):
-        utils.get_img_size(None)
-    with pytest.raises(ValueError):
-        utils.get_img_size(np.array([1]))
 
 
 def test_generate_unique_tag():

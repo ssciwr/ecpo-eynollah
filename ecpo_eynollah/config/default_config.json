@@ -1,13 +1,14 @@
 {
     "input_dir": "./data/in",
     "gutter_detection": {
-        "output_dir": "./data/out",
-        "convert_bw": false,
-        "smooth_kernel": 101,
-        "min_distance_between_splits": 600,
-        "min_depth_factor": 0.55,
+        "output_dir": "./data/out/pagesplit",
+        "ocr_model": "PP-OCRv5_server_det",
+        "device": "cpu",
+        "proj_func": "mean",
+        "number_breakpoints": 4,
+        "close_threshold": 1e-3,
         "fallback_to_center": true,
-        "jpeg_quality": 95,
-        "save_intermediate_images": false
+        "num_segments": 2,
+        "jpeg_quality": 95
     }
 }
