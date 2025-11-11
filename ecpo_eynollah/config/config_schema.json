@@ -54,6 +54,12 @@
                     "default": 2,
                     "description": "Number of segments (pages) to split the image into."
                 },
+                "gutter_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 400,
+                    "description": "Minimum size in pixels of gutter to consider for splits."
+                },
                 "jpeg_quality": {
                     "type": "integer",
                     "minimum": 1,

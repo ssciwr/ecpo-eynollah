@@ -111,6 +111,7 @@ def find_split_points(
     num_bkps: int = 4,
     close_thres: float = 1e-3,
     num_segments: int = 2,
+    gutter_size: int = 300,
     fallback: bool = True,
 ) -> Tuple[List[int], bool]:
     """Find breakpoints in the signal using Dynamic Programming,
@@ -121,6 +122,7 @@ def find_split_points(
         num_bkps (int): Number of breakpoints to find with DP.
         close_thres (float): Threshold to consider a point as "close to zero".
         num_segments (int): Number of segments (pages) to split the image into.
+        gutter_size (int): Minimum size in pixels of gutter to consider for splits.
         fallback (bool): Whether to fallback to center split if no breakpoints found.
 
     Returns:
@@ -162,22 +164,36 @@ def find_split_points(
         refined_bkps.append(group[0])
         refined_bkps.append(group[-1])
 
+    assert len(refined_bkps) % 2 == 0, "Refined breakpoints should be in pairs."
+
+    # # filter out breakpoints that are too close to each other
+    # filtered_bkps = set()
+    # for i in range(len(refined_bkps) - 1):
+    #     p0 = refined_bkps[i]
+    #     p1 = refined_bkps[i + 1]
+    #     if abs(p1 - p0) >= gutter_size:
+    #         filtered_bkps.add(p0)
+    #         filtered_bkps.add(p1)
+    # filtered_bkps = list(sorted(filtered_bkps))
+
+    filtered_bkps = refined_bkps
+
     # get only breakpoints near the center to make sure we have num_segments - 1 splits
     center = signal.shape[0] / 2
-    filtered_bkps = sorted(
-        refined_bkps,
+    near_center_bkps = sorted(
+        filtered_bkps,
         key=lambda x: abs(x - center),
     )[: num_segments - 1]
-    filtered_bkps = sorted(filtered_bkps)
+    near_center_bkps = sorted(near_center_bkps)
 
     use_fallback = False
-    if not filtered_bkps and fallback:
+    if not near_center_bkps and fallback:
         # fallback to center split
         w = signal.shape[0]
-        filtered_bkps = [w // 2]
+        near_center_bkps = [w // 2]
         use_fallback = True
 
-    return filtered_bkps, use_fallback
+    return near_center_bkps, use_fallback
 
 
 # ----------------------------
@@ -189,6 +205,7 @@ def slice_and_save(
     output_dir: Path,
     fname: str,
     unique_tag: str,
+    gutter_size: int = 300,
     jpeg_quality: int = 95,
 ):
     """Slice the rectified image at the given split columns and save segments.
@@ -200,27 +217,33 @@ def slice_and_save(
         output_dir (Path): Directory to save the segments.
         fname (str): filename of the image, used for naming output segments.
         unique_tag (str): unique tag to append to output image filenames.
+        gutter_size (int): Minimum size in pixels of gutter to consider for splits.
         jpeg_quality (int): JPEG quality for saving images.
     """
     w = img.shape[1]
     cuts = [0] + splits_internal + [w]
     saved = []
-    for i in range(len(cuts) - 1):
-        x0, x1 = cuts[i], cuts[i + 1]
+    current_cut = cuts[0]
+    i = 0
+    for next_cut in cuts[1:]:
         # ensure non-empty
-        if x1 - x0 <= 10:
+        if next_cut - current_cut <= gutter_size:
             continue  # too narrow, skip
 
         # create an image of same size but mask other areas except the segment
-        seg = img[:, x0:x1]
+        seg = img[:, current_cut:next_cut]
         out_img = np.full_like(img, 255)
-        out_img[:, x0:x1] = seg
+        out_img[:, current_cut:next_cut] = seg
 
         # save the imgage with only the segment visible
         outname = f"{fname}_p{i}_{unique_tag}.jpg"
         outpath = output_dir / outname
         utils.save_jpeg(outpath, out_img, quality=jpeg_quality)
-        saved.append((outpath, x0, x1))
+        saved.append((outpath, current_cut, next_cut))
+
+        # update for next
+        current_cut = next_cut
+        i += 1
 
     return saved
 
@@ -263,6 +286,7 @@ def process_folder(
     close_threshold = gutter_detect_config.get("close_threshold", 1e-3)
     fallback_to_center = gutter_detect_config.get("fallback_to_center", True)
     num_segments = gutter_detect_config.get("num_segments", 2)
+    gutter_size = gutter_detect_config.get("gutter_size", 300)
     jpeg_quality = gutter_detect_config.get("jpeg_quality", 95)
 
     proj_func_map = {
@@ -312,6 +336,7 @@ def process_folder(
             num_bkps=number_breakpoints,
             close_thres=close_threshold,
             num_segments=num_segments,
+            gutter_size=gutter_size,
             fallback=fallback_to_center,
         )
         if fallback:
@@ -325,6 +350,7 @@ def process_folder(
             output_dir,
             fpath.stem,
             unique_tag=unique_tag,
+            gutter_size=gutter_size,
             jpeg_quality=jpeg_quality,
         )
 

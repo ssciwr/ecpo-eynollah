@@ -9,6 +9,7 @@
         "close_threshold": 1e-3,
         "fallback_to_center": true,
         "num_segments": 2,
+        "gutter_size": 400,
         "jpeg_quality": 95
     }
 }

@@ -37,6 +37,7 @@ def test_is_valid_config():
             "close_threshold": 0.001,
             "fallback_to_center": True,
             "num_segments": 2,
+            "gutter_size": 300,
             "jpeg_quality": 95,
         }
     }
@@ -76,6 +77,11 @@ def test_is_valid_config():
     config = {"num_segments": "2"}
     assert config_handler.is_valid_config(config, "gutter_detection") is False
     config = {"num_segments": 0}
+    assert config_handler.is_valid_config(config, "gutter_detection") is False
+
+    config = {"gutter_size": "300"}
+    assert config_handler.is_valid_config(config, "gutter_detection") is False
+    config = {"gutter_size": 0}
     assert config_handler.is_valid_config(config, "gutter_detection") is False
 
     config = {"jpeg_quality": "95"}
