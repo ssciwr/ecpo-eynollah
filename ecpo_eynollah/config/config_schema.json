@@ -40,7 +40,7 @@
                 "close_threshold": {
                     "type": "number",
                     "minimum": 0.0,
-                    "default": 0.001,
+                    "default": 3.0,
                     "description": "Threshold to consider a value close to 'almost gutter'."
                 },
                 "fallback_to_center": {
@@ -54,11 +54,11 @@
                     "default": 2,
                     "description": "Number of segments (pages) to split the image into."
                 },
-                "gutter_size": {
+                "segment_size": {
                     "type": "integer",
                     "minimum": 1,
                     "default": 400,
-                    "description": "Minimum size in pixels of gutter to consider for splits."
+                    "description": "Minimum size in pixels of gutter to consider for splits. Used for cases with text in the gutter."
                 },
                 "jpeg_quality": {
                     "type": "integer",

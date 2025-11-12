@@ -6,10 +6,10 @@
         "device": "cpu",
         "proj_func": "mean",
         "number_breakpoints": 4,
-        "close_threshold": 1e-3,
+        "close_threshold": 3.0,
         "fallback_to_center": true,
         "num_segments": 2,
-        "gutter_size": 400,
+        "segment_size": 400,
         "jpeg_quality": 95
     }
 }

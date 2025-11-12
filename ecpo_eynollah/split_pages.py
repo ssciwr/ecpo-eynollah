@@ -32,7 +32,7 @@ import argparse
 from ecpo_eynollah import config_handler
 from ecpo_eynollah import utils
 from pathlib import Path
-from typing import List, Tuple, Callable, Dict
+from typing import List, Tuple, Callable, Dict, Any
 import shutil
 from paddleocr import TextDetection
 from PIL import Image, ImageDraw
@@ -75,7 +75,7 @@ def compute_signal(
     img: np.ndarray,
     dt_polys: np.ndarray,
     proj_func: Callable[[npt.ArrayLike], float] = np.mean,
-) -> np.ndarray:
+) -> Tuple[np.ndarray, np.ndarray]:
     """Create a mask from text detection polygons and compute column-wise projection signal.
 
     Args:
@@ -84,7 +84,7 @@ def compute_signal(
         proj_func (Callable): Function to compute projection, e.g. np.sum or np.mean.
 
     Returns:
-        np.ndarray: Column-wise projection signal.
+        Tuple[np.ndarray, np.ndarray]: The computed signal and the mask array.
     """
     # create a mask with background black (0)
     h, w = img.shape[:2]
@@ -100,7 +100,7 @@ def compute_signal(
     mask_array = np.array(mask)
     signal = proj_func(mask_array, axis=0)  # column-wise
 
-    return signal
+    return signal, mask_array
 
 
 # ----------------------------
@@ -111,9 +111,8 @@ def find_split_points(
     num_bkps: int = 4,
     close_thres: float = 1e-3,
     num_segments: int = 2,
-    gutter_size: int = 300,
     fallback: bool = True,
-) -> Tuple[List[int], bool]:
+) -> Tuple[List[int], bool, List[int]]:
     """Find breakpoints in the signal using Dynamic Programming,
     and return points within the resulting segments where the signal is close to zero.
 
@@ -122,12 +121,11 @@ def find_split_points(
         num_bkps (int): Number of breakpoints to find with DP.
         close_thres (float): Threshold to consider a point as "close to zero".
         num_segments (int): Number of segments (pages) to split the image into.
-        gutter_size (int): Minimum size in pixels of gutter to consider for splits.
         fallback (bool): Whether to fallback to center split if no breakpoints found.
 
     Returns:
-        Tuple[List[int], bool]: List of refined breakpoints
-            and a flag indicating if fallback was used.
+        Tuple[List[int], bool, List[int]]: List of refined breakpoints,
+            a flag indicating if fallback was used, and the original breakpoints from DP.
     """
     # use ruptures to find breakpoints
     algo = rpt.Dynp(model="l2").fit(signal)
@@ -158,7 +156,10 @@ def find_split_points(
     if current_group:
         groups.append(current_group)
 
-    # record only start and end of each group as refined breakpoints
+    # record only edges each group as refined breakpoints
+    # if both start and end in the same side of center, keep the one closer to center
+    # if across center, keep both
+    center = signal.shape[0] / 2
     refined_bkps = []
     for group in groups:
         refined_bkps.append(group[0])
@@ -166,22 +167,9 @@ def find_split_points(
 
     assert len(refined_bkps) % 2 == 0, "Refined breakpoints should be in pairs."
 
-    # # filter out breakpoints that are too close to each other
-    # filtered_bkps = set()
-    # for i in range(len(refined_bkps) - 1):
-    #     p0 = refined_bkps[i]
-    #     p1 = refined_bkps[i + 1]
-    #     if abs(p1 - p0) >= gutter_size:
-    #         filtered_bkps.add(p0)
-    #         filtered_bkps.add(p1)
-    # filtered_bkps = list(sorted(filtered_bkps))
-
-    filtered_bkps = refined_bkps
-
     # get only breakpoints near the center to make sure we have num_segments - 1 splits
-    center = signal.shape[0] / 2
     near_center_bkps = sorted(
-        filtered_bkps,
+        refined_bkps,
         key=lambda x: abs(x - center),
     )[: num_segments - 1]
     near_center_bkps = sorted(near_center_bkps)
@@ -193,7 +181,7 @@ def find_split_points(
         near_center_bkps = [w // 2]
         use_fallback = True
 
-    return near_center_bkps, use_fallback
+    return near_center_bkps, use_fallback, bkps
 
 
 # ----------------------------
@@ -205,7 +193,7 @@ def slice_and_save(
     output_dir: Path,
     fname: str,
     unique_tag: str,
-    gutter_size: int = 300,
+    segment_size: int = 300,
     jpeg_quality: int = 95,
 ):
     """Slice the rectified image at the given split columns and save segments.
@@ -217,7 +205,7 @@ def slice_and_save(
         output_dir (Path): Directory to save the segments.
         fname (str): filename of the image, used for naming output segments.
         unique_tag (str): unique tag to append to output image filenames.
-        gutter_size (int): Minimum size in pixels of gutter to consider for splits.
+        segment_size (int): Minimum size in pixels of segment to consider for splits.
         jpeg_quality (int): JPEG quality for saving images.
     """
     w = img.shape[1]
@@ -227,7 +215,7 @@ def slice_and_save(
     i = 0
     for next_cut in cuts[1:]:
         # ensure non-empty
-        if next_cut - current_cut <= gutter_size:
+        if next_cut - current_cut <= segment_size:
             continue  # too narrow, skip
 
         # create an image of same size but mask other areas except the segment
@@ -255,7 +243,7 @@ def process_folder(
     config_path: str | None = None,
     new_config: Dict | None = None,
     unique_tag: str | None = None,
-):
+) -> Dict[str, Dict[str, Any]]:
     """Process a folder of images to split pages according to the config.
 
     Args:
@@ -264,6 +252,9 @@ def process_folder(
         new_config (Dict | None): New config to override the loaded config.
         unique_tag (str | None): Unique tag to append to output files.
             If None, tag will be "ts{YYYYMMDD-HHMMSS}_h{hostname}".
+
+    Returns:
+        Dict[str, Any]: Debug information for each processed file.
     """
     # load config
     config, _ = config_handler.load_config(
@@ -286,7 +277,7 @@ def process_folder(
     close_threshold = gutter_detect_config.get("close_threshold", 1e-3)
     fallback_to_center = gutter_detect_config.get("fallback_to_center", True)
     num_segments = gutter_detect_config.get("num_segments", 2)
-    gutter_size = gutter_detect_config.get("gutter_size", 300)
+    segment_size = gutter_detect_config.get("segment_size", 400)
     jpeg_quality = gutter_detect_config.get("jpeg_quality", 95)
 
     proj_func_map = {
@@ -320,6 +311,7 @@ def process_folder(
     log_lines = []
     fallback_count = 0
     fallback_files = []
+    debug_info = {}
     for _, fpath in enumerate(tqdm(files, desc="files")):
 
         # step 1: use PaddleOCR to detect text
@@ -328,15 +320,14 @@ def process_folder(
         )
 
         # step 2: compute signal
-        signal = compute_signal(in_img, dt_polys, proj_func=proj_func)
+        signal, mask_array = compute_signal(in_img, dt_polys, proj_func=proj_func)
 
         # step 3: find split points
-        points, fallback = find_split_points(
+        points, fallback, org_bkps = find_split_points(
             signal,
             num_bkps=number_breakpoints,
             close_thres=close_threshold,
             num_segments=num_segments,
-            gutter_size=gutter_size,
             fallback=fallback_to_center,
         )
         if fallback:
@@ -350,7 +341,7 @@ def process_folder(
             output_dir,
             fpath.stem,
             unique_tag=unique_tag,
-            gutter_size=gutter_size,
+            segment_size=segment_size,
             jpeg_quality=jpeg_quality,
         )
 
@@ -359,6 +350,15 @@ def process_folder(
         log_lines.append(
             f"{fpath.name}\t{len(saved)}\t{split_str}\t{'x' if fallback else ''}"
         )
+
+        # debug info
+        debug_info[fpath.name] = {
+            "mask_array": mask_array,
+            "signal": signal,
+            "org_bkps": org_bkps,
+            "refined_bkps": points,
+            "fallback": fallback,
+        }
 
     # write log
     with open(output_dir / f"split_log_{unique_tag}.csv", "w", encoding="utf8") as f:
@@ -374,6 +374,8 @@ def process_folder(
         print("Files with fallback:")
         for fn in fallback_files:
             print(f" - {fn}")
+
+    return debug_info
 
 
 # ----------------------------
