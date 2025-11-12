@@ -156,9 +156,7 @@ def find_split_points(
     if current_group:
         groups.append(current_group)
 
-    # record only edges each group as refined breakpoints
-    # if both start and end in the same side of center, keep the one closer to center
-    # if across center, keep both
+    # record only the edges of each group as refined breakpoints
     center = signal.shape[0] / 2
     refined_bkps = []
     for group in groups:
