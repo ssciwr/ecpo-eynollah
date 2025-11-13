@@ -57,6 +57,20 @@ def test_save_jpeg(tmp_path):
     assert np.array_equal(loaded_img, img)
 
 
+def test_save_jpeg_no_extension(tmp_path):
+    img = 255 * np.ones((100, 100, 3), dtype=np.uint8)
+    save_path = tmp_path / "saved_image"  # no extension
+
+    utils.save_jpeg(save_path, img, quality=90)
+    expected_path = tmp_path / "saved_image.jpg"
+    assert expected_path.exists()
+
+    loaded_img = Image.open(expected_path)
+    loaded_img = np.array(loaded_img)
+    assert loaded_img.shape == (100, 100, 3)
+    assert np.array_equal(loaded_img, img)
+
+
 def test_generate_unique_tag():
     unique_tag = utils.generate_unique_tag()
     assert isinstance(unique_tag, str)

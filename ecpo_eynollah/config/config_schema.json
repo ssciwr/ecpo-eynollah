@@ -58,7 +58,7 @@
                     "type": "integer",
                     "minimum": 1,
                     "default": 400,
-                    "description": "Minimum size in pixels of gutter to consider for splits. Used for cases with text in the gutter."
+                    "description": "Minimum width in pixels for a segment to be valid. Segments smaller than this are skipped. Used for cases with text in the gutter."
                 },
                 "jpeg_quality": {
                     "type": "integer",

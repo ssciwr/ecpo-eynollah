@@ -23,7 +23,7 @@ def load_image(path: Path) -> np.ndarray:
         path (Path): Path to the image file.
 
     Returns:
-        np.ndarray: Loaded image in BGR format (H, W, 3).
+        np.ndarray: Loaded image in RGB format (H, W, 3).
 
     Raises:
         ValueError: If the image file path is invalid,
@@ -42,7 +42,7 @@ def save_jpeg(path: Path, img: np.ndarray, quality: int = 95):
 
     Args:
         path (Path): Path to save the image file.
-        img (np.ndarray): Image to save in BGR format (H, W, 3).
+        img (np.ndarray): Image to save in RGB format (H, W, 3).
         quality (int): JPEG quality (0-100). Default is 95.
     """
     if not path:
@@ -55,7 +55,7 @@ def save_jpeg(path: Path, img: np.ndarray, quality: int = 95):
     if ext not in [".jpg", ".jpeg", ".png"]:
         # if no valid extension, default to .jpg
         ext = ".jpg"
-        path = path + ext
+        path = Path(str(path) + ext)
 
     img_pil = Image.fromarray(img)
     img_pil.save(path, quality=quality)

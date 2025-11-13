@@ -6,7 +6,7 @@ Usage:
 
 Notes:
 - For each input image it will:
-    1) use PaddleOCR to find text dection on the image
+    1) use PaddleOCR to find text detection on the image
     2) compute signal (column-wise projection) to find vertical split points
         2.1) based on the text detection result to mask text areas, masked areas are white, background is black
         2.2) compute column-wise projection on the masked image, i.e. mean of pixel values per column (signal)
@@ -79,7 +79,7 @@ def compute_signal(
     """Create a mask from text detection polygons and compute column-wise projection signal.
 
     Args:
-        img (np.ndarray): Input image in BGR format (H, W, 3).
+        img (np.ndarray): Input image in RGB format (H, W, 3).
         dt_polys (np.ndarray): Detected text polygons, shape (N, 4, 2).
         proj_func (Callable): Function to compute projection, e.g. np.sum or np.mean.
 
@@ -198,7 +198,7 @@ def slice_and_save(
     Segments are saved as <fname>_pX.jpg where X is the segment index starting from 0.
 
     Args:
-        img (np.ndarray): Rectified image in BGR format (H, W, 3).
+        img (np.ndarray): Rectified image in RGB format (H, W, 3).
         splits_internal (List[int]): List of internal split columns (x coordinates).
         output_dir (Path): Directory to save the segments.
         fname (str): filename of the image, used for naming output segments.
@@ -221,7 +221,7 @@ def slice_and_save(
         out_img = np.full_like(img, 255)
         out_img[:, current_cut:next_cut] = seg
 
-        # save the imgage with only the segment visible
+        # save the image with only the segment visible
         outname = f"{fname}_p{i}_{unique_tag}.jpg"
         outpath = output_dir / outname
         utils.save_jpeg(outpath, out_img, quality=jpeg_quality)
@@ -332,7 +332,7 @@ def process_folder(
             fallback_count += 1
             fallback_files.append(fpath.name)
 
-        # step 3: slice & save
+        # step 4 & 5: slice & save
         saved = slice_and_save(
             in_img,
             points,

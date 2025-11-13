@@ -2,7 +2,6 @@ import pytest
 import json
 from pathlib import Path
 from ecpo_eynollah import config_handler
-from datetime import datetime
 from tests.conftest import get_files
 
 

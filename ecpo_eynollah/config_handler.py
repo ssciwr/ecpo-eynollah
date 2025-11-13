@@ -40,7 +40,8 @@ def is_valid_config(config: Dict[str, Any], parent_key: str | None) -> bool:
     Returns:
         bool: True if the config is valid, False otherwise.
     """
-    config_schema = json.load(open(CONFIG_SCHEMA_FILE, "r", encoding="utf-8"))
+    with open(CONFIG_SCHEMA_FILE, "r", encoding="utf-8") as f:
+        config_schema = json.load(f)
 
     if parent_key is not None:
         config_schema = config_schema["properties"].get(parent_key, {})
@@ -56,7 +57,7 @@ def is_valid_config(config: Dict[str, Any], parent_key: str | None) -> bool:
 def _update_new_config(
     config: Dict[str, Any], new_config: Dict[str, Any], parent_key: str | None = None
 ) -> bool:
-    """Update the cnfig directly with the new config.
+    """Update the config directly with the new config.
 
     Args:
         config (Dict[str, Any]): The config.
@@ -65,11 +66,11 @@ def _update_new_config(
             None means the whole config. Defaults to None.
 
     Returns:
-        bool: True if the config are updated, False otherwise.
+        bool: True if the config is updated, False otherwise.
     """
     updated = False
     if not config:
-        raise ValueError("Current config are empty")
+        raise ValueError("Current config is empty")
 
     for key, new_value in new_config.items():
         # check if the new value is different from the old value
@@ -137,7 +138,7 @@ def save_config_to_file(
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=4, ensure_ascii=False)
 
-    print("The config have been saved to {}".format(file_path))
+    print("The config has been saved to {}".format(file_path))
 
 
 def load_config(
@@ -147,7 +148,7 @@ def load_config(
     """Get the configuration.
     If the config path is "default", return the default configuration.
     If the config path is not default, read the config from the file.
-    If the new config are provided, overwrite the default/loaded config.
+    If the new config is provided, overwrite the default/loaded config.
 
     Args:
         config_path (Path | str): Path to the config file.
