@@ -2,7 +2,6 @@ import pytest
 from ecpo_eynollah import split_pages as sp
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
-from importlib import resources
 
 
 @pytest.fixture
@@ -61,11 +60,8 @@ def get_img():
 
 
 @pytest.fixture
-def get_img_path(get_img):
-    # pkg = resources.files("tests")
-    # in_dir = pkg / "data"
-    # in_dir.mkdir(exist_ok=True)
-    img_path = "test_image.png"
+def get_img_path(get_img, tmp_path):
+    img_path = tmp_path / "test_image.png"
     get_img.save(img_path, format="PNG")
     return img_path
 
@@ -73,7 +69,7 @@ def get_img_path(get_img):
 def test_get_text_detections_paddleocr(get_img_path):
     ocr_model = "PP-OCRv5_server_det"
     in_img, det_polys = sp.get_text_detections_paddleocr(
-        get_img_path, ocr_model, device="cpu"
+        str(get_img_path), ocr_model, device="cpu"
     )
     assert in_img.shape == (800, 1000, 3)
     assert len(det_polys) > 0
@@ -81,7 +77,7 @@ def test_get_text_detections_paddleocr(get_img_path):
 
 def test_compute_signal(get_img_path):
     in_img, det_polys = sp.get_text_detections_paddleocr(
-        get_img_path, ocr_model="PP-OCRv5_server_det", device="cpu"
+        str(get_img_path), ocr_model="PP-OCRv5_server_det", device="cpu"
     )
     signal, mask_array = sp.compute_signal(in_img, det_polys, proj_func=np.mean)
     assert len(signal) == in_img.shape[1]  # signal length should match image width
@@ -91,7 +87,7 @@ def test_compute_signal(get_img_path):
 
 def test_find_split_points(get_img_path):
     in_img, det_polys = sp.get_text_detections_paddleocr(
-        get_img_path, ocr_model="PP-OCRv5_server_det", device="cpu"
+        str(get_img_path), ocr_model="PP-OCRv5_server_det", device="cpu"
     )
     signal, _ = sp.compute_signal(in_img, det_polys, proj_func=np.mean)
     split_points, fallback, org_bkps = sp.find_split_points(
@@ -108,7 +104,7 @@ def test_find_split_points(get_img_path):
 
 def test_slice_and_save(get_img_path, tmp_path):
     in_img, det_polys = sp.get_text_detections_paddleocr(
-        get_img_path, ocr_model="PP-OCRv5_server_det", device="cpu"
+        str(get_img_path), ocr_model="PP-OCRv5_server_det", device="cpu"
     )
     signal, _ = sp.compute_signal(in_img, det_polys, proj_func=np.mean)
     split_points, fallback, org_bkps = sp.find_split_points(
