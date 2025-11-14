@@ -1,0 +1,15 @@
+{
+    "input_dir": "data/in/jingbao/1939/04",
+    "gutter_detection": {
+        "output_dir": "data/out/jingbao/1939/04",
+        "ocr_model": "PP-OCRv5_server_det",
+        "device": "cpu",
+        "proj_func": "mean",
+        "number_breakpoints": 4,
+        "close_threshold": 8.0,
+        "fallback_to_center": true,
+        "num_segments": 3,
+        "segment_size": 400,
+        "jpeg_quality": 95
+    }
+}
