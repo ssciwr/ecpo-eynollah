@@ -93,16 +93,31 @@ tedious work of labelling the very many separators we have.
 
 For ease of use, it is possible to have overlapping labels. We define the following priority
 for the labels (high to low):
+
 * `separator`
 * `heading`
 * `image`
 * `text`
+
 In step 3, this priority order will be used to disambiguate overlapping annotations.
+
+Notes for masking text in images:
+
+* For headings, we may use any shape in Label Studio to cover the heading area.
+* For regular text with lower priority than images, we should mask the area precisely, i.e. using polygon if needed.
 
 We should follow this check-list for labelling:
 
-* [ ] Are there headings that are mislabelled as article?
-* [ ] Are all images actual images or are some headings?
+* [ ] Are there headings that are mislabelled as text?
+* [ ] Are all images actual images or are some headings/text?
+
+#### Rules for masking headings
+
+A text can be considered a heading of a text block if:
+
+* It is visually separated from the surrounding text, and
+
+* It uses a larger font size
 
 ### Step 3: Exporting from LabelStudio to Eynollah
 
