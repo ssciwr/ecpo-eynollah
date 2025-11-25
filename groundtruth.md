@@ -104,20 +104,23 @@ In step 3, this priority order will be used to disambiguate overlapping annotati
 Notes for masking text in images:
 
 * For headings, we may use any shape in Label Studio to cover the heading area.
-* For regular text with lower priority than images, we should mask the area precisely, i.e. using polygon if needed.
+* For regular text with lower priority than images, we should mask the text area precisely, i.e. using polygon if needed.
 
 We should follow this check-list for labelling:
 
 * [ ] Are there headings that are mislabelled as text?
 * [ ] Are all images actual images or are some headings/text?
+* [ ] Is there any element that’s masked as "no label"? On some annotated images, the mask appears yellow (indicating a heading), but the assigned label is "no label".
 
 #### Rules for masking headings
 
-A text can be considered a heading of a text block if:
+A text can be considered a heading **of a text block** if:
 
-* It is visually separated from the surrounding text, and
+* It is visually separated from the surrounding text, or
 
 * It uses a larger font size
+
+Sub-headings should be masked in the same way as headings. Differentiating between the two is not required at this point.
 
 ### Step 3: Exporting from LabelStudio to Eynollah
 
