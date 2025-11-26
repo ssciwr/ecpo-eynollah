@@ -111,6 +111,7 @@ We should follow this check-list for labelling:
 * [ ] Are there headings that are mislabelled as text?
 * [ ] Are all images actual images or are some headings/text?
 * [ ] Is there any element that’s masked as "no label"? On some annotated images, the mask appears yellow (indicating a heading), but the assigned label is "no label".
+* [ ] Are there any masks that cut through text?
 
 #### Rules for masking headings
 
