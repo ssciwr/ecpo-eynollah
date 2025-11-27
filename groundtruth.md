@@ -119,9 +119,17 @@ A text can be considered a heading **of a text block** if:
 
 * It is visually separated from the surrounding text, or
 
-* It uses a larger font size
+* It uses a (notably) larger font size
 
 Sub-headings should be masked in the same way as headings. Differentiating between the two is not required at this point.
+
+Usually, the biggest text would be the heading. However, there are some special cases:
+
+* Text block with outstanding font size: The biggest text would be the heading
+* Text block with a bit bigger font size:
+    * If there are 2 lines/columns with no substantial difference in size or 3 lines/columns with identical size: the whole block is masked as a heading
+    * Otherwise, the biggest text would be the heading
+* Text block with separared position and multiple font-sizes, where smaller text is typically short: the whole block would be the heading for simplicity.
 
 ### Step 3: Exporting from LabelStudio to Eynollah
 
