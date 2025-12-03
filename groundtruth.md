@@ -93,16 +93,43 @@ tedious work of labelling the very many separators we have.
 
 For ease of use, it is possible to have overlapping labels. We define the following priority
 for the labels (high to low):
+
 * `separator`
 * `heading`
 * `image`
 * `text`
+
 In step 3, this priority order will be used to disambiguate overlapping annotations.
+
+Notes for masking text in images:
+
+* For headings, we may use any shape in Label Studio to cover the heading area.
+* For regular text with lower priority than images, we should mask the text area precisely, i.e. using polygon if needed.
 
 We should follow this check-list for labelling:
 
-* [ ] Are there headings that are mislabelled as article?
-* [ ] Are all images actual images or are some headings?
+* [ ] Are there headings that are mislabelled as text?
+* [ ] Are all images actual images or are some headings/text?
+* [ ] Is there any element that’s masked as "no label"? On some annotated images, the mask appears yellow (indicating a heading), but the assigned label is "no label".
+* [ ] Are there any masks that cut through text?
+
+#### Rules for masking headings
+
+A text can be considered a heading **of a text block** if:
+
+* It is visually separated from the surrounding text, or
+
+* It uses a (notably) larger font size
+
+Sub-headings should be masked in the same way as headings. Differentiating between the two is not required at this point.
+
+Usually, the biggest text would be the heading. However, there are some special cases:
+
+* Text block with outstanding font size: The biggest text would be the heading
+* Text block with a bit bigger font size:
+    * If there are 2 lines/columns with no substantial difference in size or 3 lines/columns with identical size: the whole block is masked as a heading
+    * Otherwise, the biggest text would be the heading
+* Text block with separared position and multiple font-sizes, where smaller text is typically short: the whole block would be the heading for simplicity.
 
 ### Step 3: Exporting from LabelStudio to Eynollah
 
