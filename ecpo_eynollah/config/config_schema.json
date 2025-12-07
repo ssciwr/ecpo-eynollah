@@ -1,0 +1,74 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "input_dir": {
+            "type": "string",
+            "default": "./data/in",
+            "description": "Directory containing input images."
+        },
+        "gutter_detection": {
+            "type": "object",
+            "properties": {
+                "output_dir": {
+                    "type": "string",
+                    "default": "./data/out/pagesplit",
+                    "description": "Directory to save output images of gutter detection."
+                },
+                "ocr_model": {
+                    "type": "string",
+                    "default": "PP-OCRv5_server_det",
+                    "description": "PaddleOCR model name for text detection."
+                },
+                "device": {
+                    "type": "string",
+                    "default": "cpu",
+                    "description": "Device to run the OCR model on. e.g. 'cpu', 'gpu', 'gpu:0'."
+                },
+                "proj_func": {
+                    "type": "string",
+                    "enum": ["mean", "max", "min", "sum"],
+                    "default": "mean",
+                    "description": "Projection function to use for gutter detection."
+                },
+                "number_breakpoints": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 4,
+                    "description": "Number of breakpoints (splits) to detect using Dynamic Programming."
+                },
+                "close_threshold": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "default": 3.0,
+                    "description": "Threshold to consider a value close to 'almost gutter'."
+                },
+                "fallback_to_center": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "If no minima detected, whether to fallback to a single center split (two pages)"
+                },
+                "num_segments": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 2,
+                    "description": "Number of segments (pages) to split the image into."
+                },
+                "segment_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 400,
+                    "description": "Minimum width in pixels for a segment to be valid. Segments smaller than this are skipped. Used for cases with text in the gutter."
+                },
+                "jpeg_quality": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "default": 95,
+                    "description": "JPEG quality for saved images."
+                }
+            }
+        }
+    },
+    "additionalProperties": false
+}
