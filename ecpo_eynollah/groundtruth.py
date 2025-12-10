@@ -1,4 +1,4 @@
-"""Massaging of existing ground truth into desired formats """
+"""Massaging of existing ground truth into desired formats"""
 
 import re
 import click
@@ -303,7 +303,7 @@ def labelstudio_to_png(input, output, color):
         "separator",
         "additional",
         "article",
-    ]
+    ]  # advertisement, additional, article are not used in LS output.
 
     mode = "RGB" if color else "L"
     background = (0, 0, 0) if color else 0
@@ -363,15 +363,15 @@ def labelstudio_to_png(input, output, color):
 
                 # This is a rectangle
                 if "width" in annotation:
-                    center = _percentage_to_pixels((annotation["x"], annotation["y"]))
+                    top_left = _percentage_to_pixels((annotation["x"], annotation["y"]))
                     size = _percentage_to_pixels(
                         (annotation["width"], annotation["height"])
                     )
                     bbox = [
-                        center[0] - size[0] / 2,
-                        center[1] - size[1] / 2,
-                        center[0] + size[0] / 2,
-                        center[1] + size[1] / 2,
+                        top_left[0],  # left
+                        top_left[1],  # top
+                        top_left[0] + size[0],  # right
+                        top_left[1] + size[1],  # bottom
                     ]
                     draw.rectangle(bbox, fill=colormap[annotation["labels"][0]])
 
