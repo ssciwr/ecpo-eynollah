@@ -377,6 +377,10 @@ def labelstudio_to_png(input, output, color):
 
         # Create output path
         filename = output / f"{task['name']}.png"
+
+        if filename.exists():
+            filename = output / f"{task['name']}_dup.png"
+
         image.save(filename, "PNG")
 
 
