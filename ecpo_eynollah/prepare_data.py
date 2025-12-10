@@ -42,6 +42,7 @@ def prepare_data(
     random.shuffle(labeled_files)
 
     for idx, label_file in enumerate(labeled_files):
+        print(f"Processing file {idx + 1}/{total_files}: {label_file.name}")
         img_file = img_dir / label_file.name
         if not img_file.exists():
             print(f"Image file {img_file} does not exist. Skipping.")
