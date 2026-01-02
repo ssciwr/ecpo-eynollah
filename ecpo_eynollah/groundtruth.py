@@ -290,7 +290,7 @@ def ecpo_data_to_labelstudio(
         json.dump(tasks, f)
 
 
-def labelstudio_to_png(input, output, color):
+def labelstudio_to_png(input, output, color, overwrite):
     """Create PNGs from LabelStudio annotations"""
 
     # Define the label priority from low to high. This is used to resolve
@@ -378,7 +378,7 @@ def labelstudio_to_png(input, output, color):
         # Create output path
         filename = output / f"{task['name']}.png"
 
-        if filename.exists():
+        if not overwrite and filename.exists():
             filename = output / f"{task['name']}_dup.png"
 
         image.save(filename, "PNG")
@@ -466,10 +466,16 @@ def ecpo_data_to_labelstudio_cli(
     default=False,
     help="Whether to make this colorful (mainly for debugging and visualization)",
 )
+@click.option(
+    "--overwrite/--no-overwrite",
+    type=bool,
+    default=True,
+    help="Whether to overwrite existing files in the output directory",
+)
 @click.command
-def labelstudio_to_png_cli(input, output, color):
+def labelstudio_to_png_cli(input, output, color, overwrite):
     output.mkdir(exist_ok=True, parents=True)
-    labelstudio_to_png(input, output, color)
+    labelstudio_to_png(input, output, color, overwrite)
 
 
 if __name__ == "__main__":

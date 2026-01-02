@@ -44,6 +44,7 @@ tests = [
 [project.scripts]
 ecpodata2labelstudio = "ecpo_eynollah.groundtruth:ecpo_data_to_labelstudio_cli"
 labelstudio2png = "ecpo_eynollah.groundtruth:labelstudio_to_png_cli"
+prepare_data = "ecpo_eynollah.prepare_data:prepare_data_cli"
 
 # The following section contains setuptools-specific configuration
 # options. For a full reference of available options, check the overview
