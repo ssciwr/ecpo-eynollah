@@ -41,9 +41,15 @@ def prepare_data(
     # year: characters 9th to 12th in the filename
     # page type: *0001*0004.png, or *0002*0003.png, *0005*0008.png, *0006*0007.png, etc.
     # within each group, shuffle and split according to train_ratio
+    # dup files are considered the same as original files
     groups = {}
+    dup_files = []
     for label_file in labeled_files:
         filename = label_file.stem  # without extension
+        if "_dup" in filename:
+            dup_files.append(label_file)
+            continue
+
         year = filename[8:12]
         page_num = filename.split("_")[-1]  # get the page number part
         first_page = int(page_num[:4])
@@ -55,9 +61,9 @@ def prepare_data(
         groups[group_key].append(label_file)
 
     # for debugging
-    print(f"Total labeled files: {total_files}")
+    print(f"Total labeled no-dup files: {total_files}")
     print(f"Total groups: {len(groups)}")
-    print("Group sizes:")
+    print("Group sizes (without dup files):")
     for group_key, files in groups.items():
         print(f"{group_key}: {len(files)}")
 
@@ -85,8 +91,38 @@ def prepare_data(
             # copy files
             with open(img_file, "rb") as f_src, open(dest_img_file, "wb") as f_dest:
                 f_dest.write(f_src.read())
-            with open(label_file, "rb") as f_src, open(dest_label_file, "wb") as f_dest:
+            with (
+                open(label_file, "rb") as f_src,
+                open(dest_label_file, "wb") as f_dest,
+            ):
                 f_dest.write(f_src.read())
+
+    # process dup files
+    # dup files are added to the same folder as their original files
+    print(f"Total dup files to process: {len(dup_files)}")
+    for dup_file in dup_files:
+        original_name = dup_file.name.replace("_dup", "")
+        # determine if original file is in train or eval
+        if (label_train_dir / original_name).exists():
+            dest_label_file = label_train_dir / dup_file.name
+            dest_img_file = img_train_dir / dup_file.name
+        elif (label_eval_dir / original_name).exists():
+            dest_label_file = label_eval_dir / dup_file.name
+            dest_img_file = img_eval_dir / dup_file.name
+        else:
+            print(
+                f"Original file for {dup_file} not found in train or eval directories. Skipping."
+            )
+            continue
+
+        # copy dup files
+        with (
+            open(img_dir / dup_file.name, "rb") as f_src,
+            open(dest_img_file, "wb") as f_dest,
+        ):
+            f_dest.write(f_src.read())
+        with open(dup_file, "rb") as f_src, open(dest_label_file, "wb") as f_dest:
+            f_dest.write(f_src.read())
 
     print(f"Data preparation completed.")
 
