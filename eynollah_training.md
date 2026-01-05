@@ -38,10 +38,10 @@ As `cuDNN` is not available with `conda`, we have to download the file manually.
     # something like "your_home/anaconda3/envs/eynollah-gpu"
 
     ```
-* Download cuDNN 8.6 from [cudnn-archive](https://developer.nvidia.com/rdp/cudnn-archive) and copy it to the cluster
+* Download cuDNN 8.6 (for CUDA 11.x) from [cudnn-archive](https://developer.nvidia.com/rdp/cudnn-archive) (login is needed) and copy it to the cluster
 * Extract the downloaded cuDNN file
     ```bash
-    tar -xf cudnn-linux-x86_64-8.6.0.x_cuda11-archive.tar.xz
+    tar -xf cudnn-linux-x86_64-8.6.0.163_cuda11-archive.tar.xz
     ```
 * Copy lib files into CUDA directory
     ```bash
@@ -88,10 +88,10 @@ As `cuDNN` is not available with `conda`, we have to download the file manually.
     "task": "segmentation",
     "n_classes" : 5,
     "n_epochs" : 10,
-    "input_height" : 448,
-    "input_width" : 896,
+    "input_height" : 864,
+    "input_width" : 1216,
     "weight_decay" : 1e-6,
-    "n_batch" : 10,
+    "n_batch" : 4,
     "learning_rate": 1e-4,
     "patches" : true,
     "pretraining" : true,
@@ -107,9 +107,9 @@ As `cuDNN` is not available with `conda`, we have to download the file manually.
     "scaling_flip" : false,
     "rotation": false,
     "rotation_not_90": false,
-    "transformer_num_patches_xy": [14, 7],
-    "transformer_patchsize_x": 2,
-    "transformer_patchsize_y": 2,
+    "transformer_num_patches_xy": [38, 27],
+    "transformer_patchsize_x": 1,
+    "transformer_patchsize_y": 1,
     "transformer_projection_dim": 64,
     "transformer_mlp_head_units": [128, 64],
     "transformer_layers": 8,
@@ -129,16 +129,23 @@ As `cuDNN` is not available with `conda`, we have to download the file manually.
     "data_is_provided": true,
     "dir_train": "/export/data/tle/eynollah/train",
     "dir_eval": "/export/data/tle/eynollah/eval",
-    "dir_output": "/export/data/tle/eynollah/out_gpu"
+    "dir_output": "/export/data/tle/eynollah/out"
 }
 ```
 
 #### Running statistic
-
-* GPU: compgpu12, GPU 5
+##### compgpu12
+* GPU 5
 * Memory usage: 17.5 GB
 * GPU-Util: max 92%
 * Training time: 
 * Loss:
 * Accuracy:
 
+##### hgscomp01
+* GPU1 1
+* Memory usage: 32.45 GB
+* GPU-Util: max 99%
+* Training time:
+* Loss:
+* Accuracy:
