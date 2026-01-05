@@ -128,7 +128,7 @@ def prepare_data(
 
 
 @click.option(
-    "--img_dir",
+    "--img-dir",
     type=click.Path(
         writable=False,
         file_okay=False,
@@ -140,7 +140,7 @@ def prepare_data(
     help="Directory containing the downloaded images.",
 )
 @click.option(
-    "--labeled_dir",
+    "--labeled-dir",
     type=click.Path(
         writable=False,
         file_okay=False,
@@ -152,13 +152,13 @@ def prepare_data(
     help="Directory containing the labeled data.",
 )
 @click.option(
-    "--train_ratio",
+    "--train-ratio",
     type=float,
     default=0.8,
     help="Ratio of training data to total data.",
 )
 @click.option(
-    "--out_train_dir",
+    "--out-train-dir",
     type=click.Path(
         writable=True,
         file_okay=False,
@@ -170,7 +170,7 @@ def prepare_data(
     help="Directory to save the train data.",
 )
 @click.option(
-    "--out_eval_dir",
+    "--out-eval-dir",
     type=click.Path(
         writable=True,
         file_okay=False,
@@ -197,31 +197,31 @@ if __name__ == "__main__":
         description="Prepare data for training Eynollah."
     )
     argparser.add_argument(
-        "--img_dir",
+        "--img-dir",
         type=Path,
         required=True,
         help="Directory containing the downloaded images.",
     )
     argparser.add_argument(
-        "--labeled_dir",
+        "--labeled-dir",
         type=Path,
         required=True,
         help="Directory containing the labeled data.",
     )
     argparser.add_argument(
-        "--train_ratio",
+        "--train-ratio",
         type=float,
         default=0.8,
         help="Ratio of training data to total data.",
     )
     argparser.add_argument(
-        "--out_train_dir",
+        "--out-train-dir",
         type=Path,
         required=True,
         help="Directory to save the train data.",
     )
     argparser.add_argument(
-        "--out_eval_dir",
+        "--out-eval-dir",
         type=Path,
         required=True,
         help="Directory to save the evaluation data.",
