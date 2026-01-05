@@ -5,7 +5,7 @@ import requests
 import argparse
 
 
-def download_image(json_min_file: Path, output_dir: Path):
+def download_image(json_min_file: Path, output_dir: Path, overwrite: bool = True):
 
     with open(json_min_file, "r") as f:
         data = json.load(f)
@@ -15,7 +15,7 @@ def download_image(json_min_file: Path, output_dir: Path):
 
     downloaded = 0
     failed = 0
-    exist = 0
+    overwrited = 0
     for item in data:
         img_link = item["image"]
         img_name = f"{item['name']}.png"
@@ -23,8 +23,8 @@ def download_image(json_min_file: Path, output_dir: Path):
         # download image
         response = requests.get(img_link)
         if response.status_code == 200:
-            if (output_dir / img_name).exists():
-                exist += 1
+            if (output_dir / img_name).exists() and not overwrite:
+                overwrited += 1
                 print(f"Image {img_name} already exists. Adding suffix '_dup'.")
                 img_name = f"{item['name']}_dup.png"
 
@@ -37,7 +37,7 @@ def download_image(json_min_file: Path, output_dir: Path):
             print(f"Failed to download {img_name} from {img_link}")
 
     print(f"Download completed: {downloaded} succeeded, {failed} failed.")
-    print(f"{exist} images already existed and were added with suffix '_dup'.")
+    print(f"{overwrited} images already existed and were added with suffix '_dup'.")
 
 
 if __name__ == "__main__":
@@ -52,7 +52,12 @@ if __name__ == "__main__":
         required=True,
         help="Directory to save downloaded images.",
     )
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Overwrite existing images if they exist.",
+    )
     args = parser.parse_args()
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    download_image(args.json_file, args.output_dir)
+    download_image(args.json_file, args.output_dir, args.overwrite)
