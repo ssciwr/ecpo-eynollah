@@ -15,6 +15,7 @@ def download_image(json_min_file: Path, output_dir: Path, overwrite: bool = True
 
     downloaded = 0
     failed = 0
+    existed = 0
     overwrited = 0
     for item in data:
         img_link = item["image"]
@@ -23,10 +24,12 @@ def download_image(json_min_file: Path, output_dir: Path, overwrite: bool = True
         # download image
         response = requests.get(img_link)
         if response.status_code == 200:
-            if (output_dir / img_name).exists() and not overwrite:
-                overwrited += 1
-                print(f"Image {img_name} already exists. Adding suffix '_dup'.")
-                img_name = f"{item['name']}_dup.png"
+            if (output_dir / img_name).exists():
+                existed += 1
+                if not overwrite:
+                    overwrited += 1
+                    print(f"Image {img_name} already exists. Adding suffix '_dup'.")
+                    img_name = f"{item['name']}_dup.png"
 
             with open(output_dir / img_name, "wb") as img_file:
                 img_file.write(response.content)
@@ -37,17 +40,19 @@ def download_image(json_min_file: Path, output_dir: Path, overwrite: bool = True
             print(f"Failed to download {img_name} from {img_link}")
 
     print(f"Download completed: {downloaded} succeeded, {failed} failed.")
-    print(f"{overwrited} images already existed and were added with suffix '_dup'.")
+    print(
+        f"{existed} images already existed and {overwrited} were added with suffix '_dup'."
+    )
 
 
 if __name__ == "__main__":
     # parse arguments
     parser = argparse.ArgumentParser(description="Download images from LS JSON file.")
     parser.add_argument(
-        "--json_file", type=Path, required=True, help="Path to the JSON min file."
+        "--json-file", type=Path, required=True, help="Path to the JSON min file."
     )
     parser.add_argument(
-        "--output_dir",
+        "--output-dir",
         type=Path,
         required=True,
         help="Directory to save downloaded images.",
