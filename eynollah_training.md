@@ -139,13 +139,21 @@ As `cuDNN` is not available with `conda`, we have to download the file manually.
 * Memory usage: 17.5 GB
 * GPU-Util: max 92%
 * Training time: 
-* Loss:
-* Accuracy:
+* Training loss:
+* Training accuracy:
 
 ##### hgscomp01
 * GPU1 1
 * Memory usage: 32.45 GB
 * GPU-Util: max 99%
-* Training time:
-* Loss:
-* Accuracy:
+* Training time: 4:21:13
+* Training loss: 0.1529
+* Training accuracy: 0.9511
+
+##### compgpu14
+* GPU1 1
+* Memory usage: 32.45 GB
+* GPU-Util: max 99%
+* Training time: 8:18:53
+* Training loss: 0.1257
+* Training accuracy: 0.9667

@@ -3,9 +3,10 @@ from pathlib import Path
 import json
 import requests
 import argparse
+import click
 
 
-def download_image(json_min_file: Path, output_dir: Path, overwrite: bool = True):
+def download_images(json_min_file: Path, output_dir: Path, overwrite: bool = True):
 
     with open(json_min_file, "r") as f:
         data = json.load(f)
@@ -45,6 +46,45 @@ def download_image(json_min_file: Path, output_dir: Path, overwrite: bool = True
     )
 
 
+@click.option(
+    "--json-file",
+    type=click.Path(
+        writable=False,
+        file_okay=True,
+        dir_okay=False,
+        exists=True,
+        resolve_path=True,
+        path_type=Path,
+    ),
+    help="Path to the JSON min file.",
+)
+@click.option(
+    "--output-dir",
+    type=click.Path(
+        writable=True,
+        file_okay=False,
+        dir_okay=True,
+        exists=False,
+        resolve_path=True,
+        path_type=Path,
+    ),
+    help="Directory to save downloaded images.",
+)
+@click.option(
+    "--overwrite/--no-overwrite",
+    default=True,
+    help="Overwrite existing images if they exist.",
+)
+@click.command
+def download_ls_imgs_cli(
+    json_file: Path,
+    output_dir: Path,
+    overwrite: bool,
+):
+    output_dir.mkdir(parents=True, exist_ok=True)
+    download_images(json_file, output_dir, overwrite)
+
+
 if __name__ == "__main__":
     # parse arguments
     parser = argparse.ArgumentParser(description="Download images from LS JSON file.")
@@ -65,4 +105,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    download_image(args.json_file, args.output_dir, args.overwrite)
+    download_images(args.json_file, args.output_dir, args.overwrite)
