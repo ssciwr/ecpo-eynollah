@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Script to infer Eynollah model on unseen data
+# has to run in the environment where Eynollah is installed
 
 MODEL="$1"
 IMG_DIR="$2"

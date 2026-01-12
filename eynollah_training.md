@@ -142,18 +142,20 @@ As `cuDNN` is not available with `conda`, we have to download the file manually.
 * Training loss:
 * Training accuracy:
 
-##### hgscomp01
+##### hgscomp01 (old annotation / updated annotation)
+* Using scaling for augmentation
 * GPU1 1
 * Memory usage: 32.45 GB
 * GPU-Util: max 99%
-* Training time: 4:21:13
-* Training loss: 0.1529
-* Training accuracy: 0.9511
+* Training time: 4:21:13 / 4:51:29
+* Training loss: 0.1529 / 0.1589
+* Training accuracy: 0.9511 / 0.9598
 
-##### compgpu14
+##### compgpu14 (old annotation / updated annotation)
+* Using scaling and binarization for augmentation
 * GPU1 1
 * Memory usage: 32.45 GB
 * GPU-Util: max 99%
-* Training time: 8:18:53
-* Training loss: 0.1257
-* Training accuracy: 0.9667
+* Training time: 8:18:53 / 8:16:36
+* Training loss: 0.1257 / 0.3221
+* Training accuracy: 0.9667 / 0.9491
