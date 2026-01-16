@@ -208,7 +208,7 @@ def visualize_model_output(self, prediction, img, task):
 * Training time: 4:51:29
 * Training loss: 0.1589
 * Training accuracy: 0.9598
-* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/library/44f70fc2-27c0-41c8-8b85-63efb83f2ffe/ECPO_data/eynollah_inference_20260115/scale-only)
+* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/91c8c83ebb334003b21c/)
 * Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/b3525ec2f7384054be30/)
 
 #### Scaling and binarization
@@ -219,7 +219,7 @@ def visualize_model_output(self, prediction, img, task):
 * Training time: 8:16:36
 * Training loss: 0.3221
 * Training accuracy: 0.9491
-* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/library/44f70fc2-27c0-41c8-8b85-63efb83f2ffe/ECPO_data/eynollah_inference_20260115/scale-bin)
+* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/1707b288158449529659/)
 * Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/e65fe27aa79d4a3ab54c/)
 
 #### Scaling, binarization, and rotation (not 90°)
@@ -231,7 +231,7 @@ def visualize_model_output(self, prediction, img, task):
 * Training time: 11:13:31
 * Training loss: 0.1495
 * Training accuracy: 0.9586
-* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/library/44f70fc2-27c0-41c8-8b85-63efb83f2ffe/ECPO_data/eynollah_inference_20260115/scale-bin-rotate)
+* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/6ce6f074eaa84591bb10/)
 * Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/c2d510d7de0e401aa000/)
 
 #### Scaling, binarization, and rotation (90°)
