@@ -81,7 +81,17 @@ As `cuDNN` is not available with `conda`, we have to download the file manually.
 
 To train Eynollah models, we used labeled data obtained from LabelStudio (see [step 3 of groundtruth strategy](./groundtruth.md#step-3-exporting-from-labelstudio-to-eynollah)). *It is important to note that we also refined the annotations to ensure that all text blocks are clearly separated from one another in the ground truth.*
 
-The original images and their corresponding label files are divided into `train` and `eval` directories using our `prepare-data` command. Due to the nature of the dataset, the images are first grouped by year and page type (ads-heavy vs. text-heavy) before being split into the `train` and `eval` folders.
+These labeled files are generated from LabelStudio using our `labelstudio2png` command. In the output, each pixel is assigned to one of five classes:
+
+```
+background: 0
+text: 1
+image: 2
+heading: 3
+separator: 4
+```
+
+The original images and their corresponding labeled files are divided into `train` and `eval` directories using our `prepare-data` command. Due to the nature of the dataset, the images are first grouped by year and page type (ads-heavy vs. text-heavy) before being split into the `train` and `eval` folders.
 
 ```bash
 prepare-data --img-dir <dir_to_org_imgs> --labeled-dir <dir_to_labeled_imgs> --train-ratio 0.8 --out-train-dir <train_dir> --out-eval-dir <eval_dir>
@@ -97,16 +107,6 @@ According to the instructions from Eynollah for [page segmentation](https://gith
 ```
 
 The `images` directory contains the original images used for training or evaluation, while the `labels` directory contains the corresponding labeled files.
-
-These labeled files are generated from LabelStudio using our `labelstudio2png` command. In the output, each pixel is assigned to one of five classes:
-
-```
-background: 0
-text: 1
-image: 2
-heading: 3
-separator: 4
-```
 
 ## Train Eynollah models
 
@@ -240,20 +240,20 @@ def visualize_model_output(self, prediction, img, task):
 * Rotation : 90°
 * Memory usage: 32.45 GB
 * GPU-Util: max 99%
-* Training time: TBU.
-* Training loss: TBU.
-* Training accuracy: TBU.
-* Inference results: TBU.
-* Trained model: TBU.
+* Training time: 9:04:56
+* Training loss: 0.1238
+* Training accuracy: 0.9599
+* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/abdef92df89748958c03/)
+* Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/35e907b0012c47259374/)
 
 
-#### Impression on current results (without 90° rotation)
+#### Impression on current results
 * Overall image recognition quality is quite good
 * Heading detection remains inconsistent (mixed of good and bad results)
 * Results across different trained model variants show some differences, but they are not significant
     * The `scaling-binarization` model performs slightly better than the `scaling-only` model
-    * The `scaling-binarization-rotation model (non-90° rotation)` shows some improvement in heading masking but performs worse in separating text blocks
-    * `scaling-binarization-rotation (90° rotation)` - TBU.
+    * The `scaling-binarization-rotation (non-90° rotation)` model shows some improvement in heading masking but performs worse in separating text blocks
+    * The `scaling-binarization-rotation (90° rotation)` model seems less effective for image detection than the `scaling-binarization` model
 * In general, many text blocks are not fully separated, particularly on advertisement-heavy pages compared to text-heavy pages
     * This may be related to the column-detection approach used by Eynollah?
     * Additional preprocessing steps in Eynollah’s data preparation pipeline might help improve this issue?
