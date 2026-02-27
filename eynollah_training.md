@@ -200,7 +200,7 @@ def visualize_model_output(self, prediction, img, task):
         added_image = cv2.addWeighted(img, 0.5, layout_only, 0.5, 0)  # instead of 0.5 and 0.1
 ```
 
-#### Scaling only
+#### Scaling only (with pre-train option)
 * Run on `hgscomp01`
 * GPU1
 * Memory usage: 32.45 GB
@@ -211,7 +211,7 @@ def visualize_model_output(self, prediction, img, task):
 * Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/91c8c83ebb334003b21c/)
 * Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/b3525ec2f7384054be30/)
 
-#### Scaling and binarization
+#### Scaling and binarization (with pre-train option)
 * Run on `compgpu14`
 * GPU1
 * Memory usage: 32.45 GB
@@ -222,7 +222,7 @@ def visualize_model_output(self, prediction, img, task):
 * Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/1707b288158449529659/)
 * Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/e65fe27aa79d4a3ab54c/)
 
-#### Scaling, binarization, and rotation (not 90°)
+#### Scaling, binarization, and rotation (not 90°) (with pre-train option)
 * Run on `compgpu14`
 * GPU1
 * Rotation : [45, 35, 25, 15, -15, -25, -35, -45]
@@ -234,7 +234,7 @@ def visualize_model_output(self, prediction, img, task):
 * Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/6ce6f074eaa84591bb10/)
 * Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/c2d510d7de0e401aa000/)
 
-#### Scaling, binarization, and rotation (90°)
+#### Scaling, binarization, and rotation (90°) (with pre-train option)
 * Run on `compgpu14`
 * GPU1
 * Rotation : 90°
@@ -245,6 +245,17 @@ def visualize_model_output(self, prediction, img, task):
 * Training accuracy: 0.9599
 * Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/abdef92df89748958c03/)
 * Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/35e907b0012c47259374/)
+
+#### Scaling and binarization (without pre-train option)
+* Run on `compgpu14`
+* GPU1
+* Memory usage: 32.45 GB
+* GPU-Util: max 99%
+* Training time: 8:50:29
+* Training loss: 0.0556
+* Training accuracy: 0.9788
+* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/59a90f62088a4c34879d/)
+* Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/d2ba5e27e74c4b8fb628/)
 
 
 #### Impression on current results
@@ -257,3 +268,13 @@ def visualize_model_output(self, prediction, img, task):
 * In general, many text blocks are not fully separated, particularly on advertisement-heavy pages compared to text-heavy pages
     * This may be related to the column-detection approach used by Eynollah?
     * Additional preprocessing steps in Eynollah’s data preparation pipeline might help improve this issue?
+
+
+#### Fine-tuning vs. training from scratch (with scaling and binarization)
+* The inference results of these two models are quite similar.
+* For the Jingbao test set
+    - The model trained from scratch does not outperform the fine-tuned model
+    - In some cases, the trained-from-scratch model separates text blocks better, while in other cases the fine-tuned model performs better. This behavior is also observed for images and headings.
+    - One noticeable difference is that the trained-from-scratch model produces more noise outside the main frame area compared to the fine-tuned model.
+* For non-Jingbao sample images
+    - Both the trained-from-scratch and fine-tuned models show limited performance, with text blocks not being separated correctly.
