@@ -13,6 +13,9 @@ import tqdm
 from PIL import Image, ImageDraw
 from urllib.parse import unquote
 
+from shapely.geometry import Polygon, Point
+from shapely.affinity import scale
+
 
 def _recursive_unquote(url):
     """Unquote a URL recursively until it does not change anymore"""
@@ -293,9 +296,13 @@ def ecpo_data_to_labelstudio(
 def labelstudio_to_png(input, output, color, overwrite):
     """Create PNGs from LabelStudio annotations"""
 
+    # special label used to draw boundaries around other annotations
+    artificial_boundary = "artBoundary"
+
     # Define the label priority from low to high. This is used to resolve
     # overlapping annotations gracefully.
     label_priority = [
+        artificial_boundary,
         "text",
         "advertisement",
         "image",
@@ -308,13 +315,14 @@ def labelstudio_to_png(input, output, color, overwrite):
     mode = "RGB" if color else "L"
     background = (0, 0, 0) if color else 0
     colormap = {
-        "text": (231, 76, 60) if color else 1,
-        "article": (231, 76, 60) if color else 1,
-        "image": (52, 152, 219) if color else 2,
-        "heading": (230, 126, 34) if color else 3,
-        "separator": (155, 89, 182) if color else 4,
-        "advertisement": (46, 204, 113) if color else 5,
-        "additional": (52, 73, 94) if color else 6,
+        artificial_boundary: (255, 255, 255) if color else 1,
+        "text": (231, 76, 60) if color else 2,
+        "article": (231, 76, 60) if color else 2,
+        "image": (52, 152, 219) if color else 3,
+        "heading": (230, 126, 34) if color else 4,
+        "separator": (155, 89, 182) if color else 45,
+        "advertisement": (46, 204, 113) if color else 6,
+        "additional": (52, 73, 94) if color else 7,
     }
 
     # Read the exported data
@@ -335,45 +343,113 @@ def labelstudio_to_png(input, output, color, overwrite):
                 coord[1] / 100 * metadata["height"],
             )
 
+        def _get_buffer_points(annotation, buffer_size, annotation_type="polygon"):
+            """Get the points of a buffered annotation."""
+            if annotation_type == "polygon":
+                org_points = [_percentage_to_pixels(c) for c in annotation["points"]]
+                if buffer_size == 0:
+                    return org_points
+
+                org_polygon = Polygon(org_points)
+                buffered_polygon = org_polygon.buffer(buffer_size, join_style="mitre")
+                return list(buffered_polygon.exterior.coords)
+            elif annotation_type == "ellipse":
+                cx, cy = _percentage_to_pixels((annotation["x"], annotation["y"]))
+                rx, ry = _percentage_to_pixels(
+                    (annotation["radiusX"], annotation["radiusY"])
+                )
+                if buffer_size == 0:
+                    return [cx, cy, rx, ry]
+
+                return [cx, cy, rx + buffer_size, ry + buffer_size]
+            else:
+                # reactangle
+                top_left = _percentage_to_pixels((annotation["x"], annotation["y"]))
+                size = _percentage_to_pixels(
+                    (annotation["width"], annotation["height"])
+                )
+
+                if buffer_size == 0:
+                    return [top_left[0], top_left[1], size[0], size[1]]
+
+                return [
+                    top_left[0] - buffer_size,
+                    top_left[1] - buffer_size,
+                    size[0] + 2 * buffer_size,
+                    size[1] + 2 * buffer_size,
+                ]
+
+        def _get_buffer_info(annotation, buffer_size, annotation_type="polygon"):
+            """Get buffered points and the corresponding filling color"""
+            points_info = _get_buffer_points(annotation, buffer_size, annotation_type)
+            fill_color = colormap[annotation["labels"][0]]
+
+            if buffer_size > 0:  # artifical boundary
+                return points_info, colormap[artificial_boundary]
+
+            return points_info, fill_color
+
+        def _draw_annotation(annotation, buffer_size=1):
+            """Draw an annotation on the image.
+            The buffer_size is used to draw an additional boundary around the real annotation.
+            """
+
+            if buffer_size < 0:
+                raise ValueError("Buffer size must be non-negative")
+
+            # This is a polygon
+            if "points" in annotation:
+                # covert points to polygon
+                target_points, fill_color = _get_buffer_info(
+                    annotation, buffer_size, annotation_type="polygon"
+                )
+                draw.polygon(
+                    target_points,
+                    fill=fill_color,
+                )
+
+            # This is an ellipse
+            if "radiusX" in annotation:
+                target_points, fill_color = _get_buffer_info(
+                    annotation, buffer_size, annotation_type="ellipse"
+                )
+                cx, cy, rx, ry = target_points
+                bbox = [
+                    cx - rx,
+                    cy - ry,
+                    cx + rx,
+                    cy + ry,
+                ]
+                draw.ellipse(bbox, fill=fill_color)
+
+            # This is a rectangle
+            if "width" in annotation:
+                target_points, fill_color = _get_buffer_info(
+                    annotation, buffer_size, annotation_type="rectangle"
+                )
+                x, y, width, height = target_points
+                bbox = [
+                    x,
+                    y,
+                    x + width,
+                    y + height,
+                ]
+                draw.rectangle(bbox, fill=fill_color)
+
         for label in label_priority:
             for annotation in task["label"]:
-                if annotation["labels"][0] != label:
-                    continue
+                # draw artifical boundaries first
+                if label == artificial_boundary:
+                    _draw_annotation(annotation, buffer_size=1)
+                else:
+                    # draw other annotations in order of priority
 
-                # This is a polygon
-                if "points" in annotation:
-                    draw.polygon(
-                        [_percentage_to_pixels(c) for c in annotation["points"]],
-                        fill=colormap[annotation["labels"][0]],
-                    )
+                    if annotation["labels"][0] != label:
+                        continue
 
-                # This is an ellipse
-                if "radiusX" in annotation:
-                    center = _percentage_to_pixels((annotation["x"], annotation["y"]))
-                    radius = _percentage_to_pixels(
-                        (annotation["radiusX"], annotation["radiusY"])
-                    )
-                    bbox = [
-                        center[0] - radius[0],
-                        center[1] - radius[1],
-                        center[0] + radius[0],
-                        center[1] + radius[1],
-                    ]
-                    draw.ellipse(bbox, fill=colormap[annotation["labels"][0]])
-
-                # This is a rectangle
-                if "width" in annotation:
-                    top_left = _percentage_to_pixels((annotation["x"], annotation["y"]))
-                    size = _percentage_to_pixels(
-                        (annotation["width"], annotation["height"])
-                    )
-                    bbox = [
-                        top_left[0],  # left
-                        top_left[1],  # top
-                        top_left[0] + size[0],  # right
-                        top_left[1] + size[1],  # bottom
-                    ]
-                    draw.rectangle(bbox, fill=colormap[annotation["labels"][0]])
+                    _draw_annotation(
+                        annotation, buffer_size=0
+                    )  # no buffer for real annotations
 
         # Create output path
         filename = output / f"{task['name']}.png"
