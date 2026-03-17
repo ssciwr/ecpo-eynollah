@@ -440,7 +440,9 @@ def labelstudio_to_png(input, output, color, overwrite):
             for annotation in task["label"]:
                 # draw artifical boundaries first
                 if label == artificial_boundary:
-                    _draw_annotation(annotation, buffer_size=1)
+                    _draw_annotation(
+                        annotation, buffer_size=2
+                    )  # buffer for artificial boundaries
                 else:
                     # draw other annotations in order of priority
 
