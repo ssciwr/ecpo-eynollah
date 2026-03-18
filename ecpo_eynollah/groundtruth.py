@@ -293,7 +293,9 @@ def ecpo_data_to_labelstudio(
         json.dump(tasks, f)
 
 
-def labelstudio_to_png(input, output, color, overwrite):
+def labelstudio_to_png(
+    input, output, color, overwrite, artboundary_buffer_size=2, considered_ids=None
+):
     """Create PNGs from LabelStudio annotations"""
 
     # special label used to draw boundaries around other annotations
@@ -329,7 +331,16 @@ def labelstudio_to_png(input, output, color, overwrite):
     with open(input, "r") as f:
         data = json.load(f)
 
+    print(
+        f"Creating PNGs with {artboundary_buffer_size} pixels buffer size."
+        f"Considering IDs: {considered_ids}"
+    )
+
     for task in tqdm.tqdm(data):
+        # only consider task with the given index for debugging
+        if considered_ids is not None and task["id"] not in considered_ids:
+            continue
+
         # Get the image size and instantiate an empty image
         metadata = iiif_metadata(task["image"])
         image = Image.new(mode, (metadata["width"], metadata["height"]), background)
@@ -389,7 +400,7 @@ def labelstudio_to_png(input, output, color, overwrite):
 
             return points_info, fill_color
 
-        def _draw_annotation(annotation, buffer_size=1):
+        def _draw_annotation(annotation, buffer_size=2):
             """Draw an annotation on the image.
             The buffer_size is used to draw an additional boundary around the real annotation.
             """
@@ -441,7 +452,7 @@ def labelstudio_to_png(input, output, color, overwrite):
                 # draw artifical boundaries first
                 if label == artificial_boundary:
                     _draw_annotation(
-                        annotation, buffer_size=2
+                        annotation, buffer_size=artboundary_buffer_size
                     )  # buffer for artificial boundaries
                 else:
                     # draw other annotations in order of priority
@@ -550,10 +561,33 @@ def ecpo_data_to_labelstudio_cli(
     default=True,
     help="Whether to overwrite existing files in the output directory",
 )
+@click.option(
+    "--buffer-size",
+    type=int,
+    default=2,
+    help="The buffer size for the artificial boundaries in pixels. Set to 0 to disable.",
+)
+@click.option(
+    "--considered-ids",
+    type=str,
+    default=None,
+    help="Comma-separated list of task IDs to consider. If not set, all tasks are considered.",
+)
 @click.command
-def labelstudio_to_png_cli(input, output, color, overwrite):
+def labelstudio_to_png_cli(
+    input, output, color, overwrite, buffer_size, considered_ids
+):
     output.mkdir(exist_ok=True, parents=True)
-    labelstudio_to_png(input, output, color, overwrite)
+    if considered_ids is not None:
+        considered_ids = [int(i) for i in considered_ids.split(",")]
+    labelstudio_to_png(
+        input,
+        output,
+        color,
+        overwrite,
+        artboundary_buffer_size=buffer_size,
+        considered_ids=considered_ids,
+    )
 
 
 if __name__ == "__main__":
