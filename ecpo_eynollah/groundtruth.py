@@ -13,8 +13,9 @@ import tqdm
 from PIL import Image, ImageDraw
 from urllib.parse import unquote
 
-from shapely.geometry import Polygon, Point
-from shapely.affinity import scale
+from shapely.geometry import Polygon
+
+import math
 
 
 def _recursive_unquote(url):
@@ -336,6 +337,10 @@ def labelstudio_to_png(
         f"Considering IDs: {considered_ids}"
     )
 
+    # record image with rotated rectangles
+    num_rotated_rectangles = 0
+    ro_rec_files = []
+
     for task in tqdm.tqdm(data):
         # only consider task with the given index for debugging
         if considered_ids is not None and task["id"] not in considered_ids:
@@ -439,16 +444,59 @@ def labelstudio_to_png(
                     annotation, buffer_size, annotation_type="rectangle"
                 )
                 x, y, width, height = target_points
-                bbox = [
-                    x,
-                    y,
-                    x + width,
-                    y + height,
-                ]
-                draw.rectangle(bbox, fill=fill_color)
+
+                # consider rotation if available!
+                if "rotation" in annotation and annotation["rotation"] != 0:
+                    # draw the rectangle differently
+                    # ATTENTION! labelstudio stores rotation around top-left cornor,
+                    # not around the center
+
+                    # corners relative to top-left corner
+                    corners = [
+                        (0, 0),  # top-left corner
+                        (width, 0),  # top-right corner
+                        (width, height),  # bottom-right corner
+                        (0, height),  # bottom-left corner
+                    ]
+
+                    # ATTENTION! labelstudio stores rotation in clockwise direction,
+                    # but the formular for rotation is based on counter-clockwise rotation.
+                    # So we need to negate the angle here.
+                    angle_rad = math.radians(-annotation["rotation"])
+
+                    rotated_corners = []
+                    for dx, dy in corners:
+                        # apply rotation
+                        # ATTENTION! PIL use downward y-axis,
+                        # but the formular for rotation is based on upward y-axis
+                        # the original formular is:
+                        # rx = dx * cos(angle_rad) - dy * math.sin(angle_rad)
+                        # ry = dx * math.sin(angle_rad) + dy * math.cos(angle_rad)
+                        # after considering the y-axis direction, it becomes:
+                        rx = dx * math.cos(angle_rad) + dy * math.sin(angle_rad)
+                        ry = -dx * math.sin(angle_rad) + dy * math.cos(angle_rad)
+                        rotated_corners.append((x + rx, y + ry))
+
+                    draw.polygon(rotated_corners, fill=fill_color)
+                else:
+                    bbox = [
+                        x,
+                        y,
+                        x + width,
+                        y + height,
+                    ]
+                    draw.rectangle(bbox, fill=fill_color)
 
         for label in label_priority:
             for annotation in task["label"]:
+                # record rotated rectangles for debugging
+                if "rotation" in annotation and annotation["rotation"] != 0:
+                    # # debug
+                    # print(
+                    #     f"Found rotated rectangle in file {task['name']}. Rotation angle: {annotation['rotation']} degrees."
+                    # )
+                    num_rotated_rectangles += 1
+                    ro_rec_files.append(f"{task["name"]}-{annotation["labels"][0]}")
                 # draw artifical boundaries first
                 if label == artificial_boundary:
                     _draw_annotation(
@@ -471,6 +519,10 @@ def labelstudio_to_png(
             filename = output / f"{task['name']}_dup.png"
 
         image.save(filename, "PNG")
+
+    # for debugging
+    if num_rotated_rectangles > 0:
+        print(f"Found {num_rotated_rectangles} rotated rectangles.")
 
 
 @click.option(
