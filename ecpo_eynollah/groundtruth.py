@@ -452,6 +452,9 @@ def labelstudio_to_png(
                     # not around the center
 
                     # corners relative to top-left corner
+                    # note that y-axis is downward in PIL
+                    # if y-axis is upward, the corners should be:
+                    # (0, 0), (width, 0), (width, -height), (0, -height)
                     corners = [
                         (0, 0),  # top-left corner
                         (width, 0),  # top-right corner
@@ -459,22 +462,20 @@ def labelstudio_to_png(
                         (0, height),  # bottom-left corner
                     ]
 
-                    # ATTENTION! labelstudio stores rotation in range 0-360,
-                    # but the formular for rotation uses both positive and negative values.
-                    # So we need to negate the angle here.
-                    angle_rad = math.radians(-annotation["rotation"])
+                    # labelstudio stores rotation in range 0-360,
+                    # here, we keep rotation degree as is
+                    angle_rad = math.radians(annotation["rotation"])
 
                     rotated_corners = []
                     for dx, dy in corners:
                         # apply rotation
-                        # ATTENTION! PIL use downward y-axis,
-                        # but the formular for rotation is based on upward y-axis
-                        # the original formular is:
-                        # rx = dx * cos(angle_rad) - dy * math.sin(angle_rad)
-                        # ry = dx * math.sin(angle_rad) + dy * math.cos(angle_rad)
+                        # in case of upward y-axis, rotate at top-left corner,
+                        # the formular will be:
+                        # rx = dx * cos(angle_rad) + dy * math.sin(angle_rad)
+                        # ry = - dx * math.sin(angle_rad) + dy * math.cos(angle_rad)
                         # after considering the y-axis direction, it becomes:
-                        rx = dx * math.cos(angle_rad) + dy * math.sin(angle_rad)
-                        ry = -dx * math.sin(angle_rad) + dy * math.cos(angle_rad)
+                        rx = dx * math.cos(angle_rad) - dy * math.sin(angle_rad)
+                        ry = dx * math.sin(angle_rad) + dy * math.cos(angle_rad)
                         rotated_corners.append((x + rx, y + ry))
 
                     draw.polygon(rotated_corners, fill=fill_color)
