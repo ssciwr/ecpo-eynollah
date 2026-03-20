@@ -323,7 +323,7 @@ def labelstudio_to_png(
         "article": (231, 76, 60) if color else 2,
         "image": (52, 152, 219) if color else 3,
         "heading": (230, 126, 34) if color else 4,
-        "separator": (155, 89, 182) if color else 45,
+        "separator": (155, 89, 182) if color else 5,
         "advertisement": (46, 204, 113) if color else 6,
         "additional": (52, 73, 94) if color else 7,
     }
@@ -459,8 +459,8 @@ def labelstudio_to_png(
                         (0, height),  # bottom-left corner
                     ]
 
-                    # ATTENTION! labelstudio stores rotation in clockwise direction,
-                    # but the formular for rotation is based on counter-clockwise rotation.
+                    # ATTENTION! labelstudio stores rotation in range 0-360,
+                    # but the formular for rotation uses both positive and negative values.
                     # So we need to negate the angle here.
                     angle_rad = math.radians(-annotation["rotation"])
 
