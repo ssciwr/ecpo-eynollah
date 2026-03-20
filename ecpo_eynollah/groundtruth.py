@@ -295,7 +295,7 @@ def ecpo_data_to_labelstudio(
 
 
 def labelstudio_to_png(
-    input, output, color, overwrite, artboundary_buffer_size=2, considered_ids=None
+    input, output, color, overwrite, artboundary_buffer_size=10, considered_ids=None
 ):
     """Create PNGs from LabelStudio annotations"""
 
@@ -405,7 +405,7 @@ def labelstudio_to_png(
 
             return points_info, fill_color
 
-        def _draw_annotation(annotation, buffer_size=2):
+        def _draw_annotation(annotation, buffer_size=10):
             """Draw an annotation on the image.
             The buffer_size is used to draw an additional boundary around the real annotation.
             """
@@ -616,7 +616,7 @@ def ecpo_data_to_labelstudio_cli(
 @click.option(
     "--buffer-size",
     type=int,
-    default=2,
+    default=10,
     help="The buffer size for the artificial boundaries in pixels. Set to 0 to disable.",
 )
 @click.option(
