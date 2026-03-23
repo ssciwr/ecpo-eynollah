@@ -501,7 +501,7 @@ def labelstudio_to_png(
                     num_rotated_rectangles += 1
                     ro_rec_files.append(f"{task["name"]}-{annotation["labels"][0]}")
                 # draw artifical boundaries first
-                if label == artificial_boundary:
+                if label == artificial_boundary and artboundary_buffer_size > 0:
                     _draw_annotation(
                         annotation, buffer_size=artboundary_buffer_size
                     )  # buffer for artificial boundaries
