@@ -301,5 +301,5 @@ def visualize_model_output(self, prediction, img, task):
 * Training time: 2 days, 22:11:33 (much longer than before. Maybe because all GPUs that share the same CPU are using with maximum GPU-Util at the same time?)
 * Training loss: 0.0812
 * Training accuracy: 0.9688
-* Inference results: [heiBOX folder]()
-* Trained model: [heiBOX link]()
+* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/f1ae6d46f24e4f40a153/)
+* Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/c0d062c5717d400ebbad/)
