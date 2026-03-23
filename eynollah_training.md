@@ -278,3 +278,17 @@ def visualize_model_output(self, prediction, img, task):
     - One noticeable difference is that the trained-from-scratch model produces more noise outside the main frame area compared to the fine-tuned model.
 * For non-Jingbao sample images
     - Both the trained-from-scratch and fine-tuned models show limited performance, with text blocks not being separated correctly.
+
+
+### Training with artificial boundaries
+
+#### Scaling and binarization (with pre-train option)
+* Run on `compgpu9`
+* GPU1
+* Memory usage: 32.45 GB
+* GPU-Util: max 99%
+* Training time: 1 day, 22:06:42 (don't know why it took much longer than before)
+* Training loss: 0.0532
+* Training accuracy: 0.9795
+* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/32a2f27a832843eb8484/)
+* Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/c956e55a939744b39d91/)
