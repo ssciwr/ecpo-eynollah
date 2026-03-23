@@ -286,7 +286,7 @@ def visualize_model_output(self, prediction, img, task):
 * Run on `compgpu9`
 * GPU1
 * Memory usage: 32.45 GB
-* GPU-Util: max 99%
+* GPU-Util: max 99% (but not often. I'm wondering if the training process was not fully using the GPU)
 * Training time: 1 day, 22:06:42 (don't know why it took much longer than before)
 * Training loss: 0.0532
 * Training accuracy: 0.9795
