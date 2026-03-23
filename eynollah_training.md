@@ -280,11 +280,11 @@ def visualize_model_output(self, prediction, img, task):
     - Both the trained-from-scratch and fine-tuned models show limited performance, with text blocks not being separated correctly.
 
 
-### Training with artificial boundaries
+### Training with artificial boundaries, 10 pixels buffering
 
 #### Scaling and binarization (with pre-train option)
 * Run on `compgpu9`
-* GPU1
+* GPU5
 * Memory usage: 32.45 GB
 * GPU-Util: max 99% (but not often. I'm wondering if the training process was not fully using the GPU)
 * Training time: 1 day, 22:06:42 (don't know why it took much longer than before)
@@ -292,3 +292,14 @@ def visualize_model_output(self, prediction, img, task):
 * Training accuracy: 0.9795
 * Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/32a2f27a832843eb8484/)
 * Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/c956e55a939744b39d91/)
+
+#### Scaling and binarization (without pre-train option)
+* Run on `compgpu10`
+* GPU7
+* Memory usage: 32.45 GB
+* GPU-Util: max 99% (but also not often)
+* Training time: 2 days, 22:11:33 (much longer than before. Maybe because all GPUs that share the same CPU are using with maximum GPU-Util at the same time?)
+* Training loss: 0.0812
+* Training accuracy: 0.9688
+* Inference results: [heiBOX folder]()
+* Trained model: [heiBOX link]()
