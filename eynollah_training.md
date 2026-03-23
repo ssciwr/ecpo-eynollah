@@ -303,3 +303,9 @@ def visualize_model_output(self, prediction, img, task):
 * Training accuracy: 0.9688
 * Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/f1ae6d46f24e4f40a153/)
 * Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/c0d062c5717d400ebbad/)
+
+#### First impression
+* The retrained model (model without pre-train option) creates a lot of false positives (noise) outside the main frame area, which is not the case for the fine-tuned model.
+* The aritifical boundaries with 10 pixels buffering do not improve the separation of text blocks significantly
+    * At some spots, the boundaries seem to help separate text blocks better, but in other cases they do not make a noticeable difference, or even confused the model more.
+* Both models yield not promising results on non-Jingbao sample images.
