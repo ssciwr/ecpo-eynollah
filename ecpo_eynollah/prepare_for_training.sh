@@ -28,6 +28,7 @@ mkdir -p "$ROOT_DIR/jb-org"
 mkdir -p "$ROOT_DIR/train"
 mkdir -p "$ROOT_DIR/eval"
 mkdir -p "$ROOT_DIR/labelstudio/no-color"
+mkdir -p "$ROOT_DIR/out"
 
 
 # download original images, using LabelStudio JSON-MIN file
