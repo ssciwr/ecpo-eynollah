@@ -15,6 +15,20 @@ Depending on the year and page type (ads-heavy vs. text-heavy), the images are g
 
 In detail, the characteristics of images (with ground truth) in the Jingbao collection are as follows:
 
+```
+Total labeled no-dup files: 82
+Total groups: 8
+Group sizes (without dup files):
+('1939', '6-7'): 10
+('1939', '5-8'): 11
+('1939', '2-3'): 11
+('1939', '1-4'): 10
+('1920', '1-4'): 10
+('1920', '2-3'): 10
+('1930', '2-3'): 10
+('1930', '1-4'): 10
+```
+
 * 1920/04: 20 images (10 ads-heavy, 10 text-heavy)
     + no text in gutter area
     + page 0001to0004: ads-heavy with several big font headings and some pictures
