@@ -32,6 +32,7 @@ dependencies = [
     "requests",
     "svgelements",
     "tqdm",
+    "shapely",
 ]
 
 [project.optional-dependencies]
