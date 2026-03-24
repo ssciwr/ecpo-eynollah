@@ -1,5 +1,45 @@
 # Training Eynollah with labeled data
 
+## Jingbao collection
+
+### Data with ground truth
+
+There are 100 labeled images in total, extracted from 3 years:
+* 1920/04
+* 1930/04
+* 1939/04
+
+However, there are 18 images with the same file names of the others, even though their annotations are slightly different. To make it simple, we overwrote the duplicated files with the same file names, which resulted in 82 unique labeled images. These 82 images are used for training and evaluation.
+
+Depending on the year and page type (ads-heavy vs. text-heavy), the images are groupped into categories before spliting into `train` and `eval` folders with a specified ratio (e.g. 80% for training and 20% for evaluation).
+
+In detail, the characteristics of images (with ground truth) in the Jingbao collection are as follows:
+
+* 1920/04: 20 images (10 ads-heavy, 10 text-heavy)
+    + no text in gutter area
+    + page 0001to0004: ads-heavy with several big font headings and some pictures
+    + page 0002to0003: text-heavy, up to 1 image
+
+* 1930/04: 20 images (10 ads-heavy, 20 text-heavy)
+    + ads in gutter area for both ads-heavy and text-heavy pages
+        + heavy-text ads for ads-heavy pages
+        + light-to-simple-text ads for text-heavy pages
+    + page 0001to0004: ads-heavy with several big font headings and some pictures
+    + page 0002to0003: text-heavy, 5 to 7 images
+* 1939/04: 40 images with no clear distinction between ads-heavy and text-heavy pages
+    + all pages have text-heavy parts and ads in the gutter area. Text in the gutter area is also heavy.
+    + page 0001to0004: ads in top quarter of page 0001 and bottom quarter of page 0002, while the rest of the pages are text-heavy with some images and headings
+    + page 0002to0003: ads in the bottom quarter (or third) of both pages, while the rest of the pages are text-heavy with some headings, no images
+    + page 0005to0008: ads appear randomly, occupying around 50% of the page area, while the rest of the pages are text-heavy with some images and headings
+    + page 0006to0007: ads in the bottom quarter (or third) of both pages, while the rest of the pages are text-heavy with some images and headings
+
+### Data without ground truth
+
+I only inspected 46 Jingbao images without ground truth so far.
+
+* Same attributes as 1930/04: 1919/04, 1920/01, 1921/02, 1922/02, 1923/02, 1924/01, 1925/01, 1926/01, 1927/01, 1928/01, 1929/01, 1930/01-02, 1931/01, 1932/01, 1933/01, 1934/02, 1935/01, 1936/05, 1937/01
+* Same attributes as 1939/04: 1938/02, 1939/01, 1940/01
+
 ## References from Eynollah
 
 * [How to train an Eynollah model](https://github.com/qurator-spk/eynollah/blob/main/docs/train.md#train-a-model)
