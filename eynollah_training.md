@@ -363,3 +363,17 @@ def visualize_model_output(self, prediction, img, task):
 * The aritifical boundaries with 10 pixels buffering do not improve the separation of text blocks significantly
     * At some spots, the boundaries seem to help separate text blocks better, but in other cases they do not make a noticeable difference, or even confused the model more.
 * Both models yield not promising results on non-Jingbao sample images.
+
+
+### Training with artificial boundaries, 10 pixels buffering, no heading class
+
+#### Scaling and binarization (with pre-train option)
+* Run on `hgscomp01`
+* GPU0
+* Memory usage: 32.45 GB
+* GPU-Util: max 99%
+* Training time: 7:48:02
+* Training loss: 0.0475
+* Training accuracy: 0.9819
+* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/f6684a567b564418b550/)
+* Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/1ac47c0f22fe47fcb233/)
