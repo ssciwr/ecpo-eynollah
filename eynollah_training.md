@@ -386,6 +386,15 @@ It seems this model yields worse results in separating text blocks than other mo
 
 ### Training with artificial boundaries, 10 pixels buffering, with heading class, bigger input size
 
+Some options in the configuration are updated as follows
+```
+input_height: 1728
+input_width: 2432
+transformer_num_patches_xy: [38, 27]
+transformer_patchsize_x: 2
+transformer_patchsize_y: 2
+```
+
 #### Scaling and binarization (with pre-train option)
 * Run on `hgscomp01`
 * GPU0
