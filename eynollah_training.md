@@ -382,3 +382,20 @@ def visualize_model_output(self, prediction, img, task):
 It seems this model yields worse results in separating text blocks than other model. Reasons might include:
 * The text class occupies most of pixels within the image, dominating other classes in model's prediction
 * In our annotation, boundaries between texts and headings are usually thin and some headings streach over multiple text block. This might challenge the text block separation in test images.
+
+
+### Training with artificial boundaries, 10 pixels buffering, with heading class, bigger input size
+
+#### Scaling and binarization (with pre-train option)
+* Run on `hgscomp01`
+* GPU0
+* Memory usage: 64.45 GB
+* GPU-Util: max 99%
+* Training time: x:xx:xxx
+* Training loss: x.xx
+* Training accuracy: x.xxx
+* Inference results: [heiBOX folder]()
+* Trained model: [heiBOX link]()
+
+#### First impression
+TBU.
