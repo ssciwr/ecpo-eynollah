@@ -323,10 +323,10 @@ def labelstudio_to_png(
         "article": (231, 76, 60) if color else 2,
         "image": (52, 152, 219) if color else 3,
         "heading": (
-            (231, 76, 60) if color else 2
-        ),  # original (230, 126, 34) if color else 4
+            (230, 126, 34) if color else 4
+        ),  # when no headings (231, 76, 60) if color else 2
         "separator": (
-            (155, 89, 182) if color else 4  # original (155, 89, 182) if color else 5
+            (155, 89, 182) if color else 5  # when no headings: 4
         ),  # we only use up to here, 6 classes in total
         "advertisement": (46, 204, 113) if color else 6,
         "additional": (52, 73, 94) if color else 7,
