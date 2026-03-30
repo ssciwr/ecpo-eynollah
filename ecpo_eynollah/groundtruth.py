@@ -295,7 +295,13 @@ def ecpo_data_to_labelstudio(
 
 
 def labelstudio_to_png(
-    input, output, color, overwrite, artboundary_buffer_size=10, considered_ids=None
+    input,
+    output,
+    color,
+    overwrite,
+    artboundary_buffer_size=10,
+    considered_ids=None,
+    withheadings=True,
 ):
     """Create PNGs from LabelStudio annotations"""
 
@@ -331,6 +337,13 @@ def labelstudio_to_png(
         "advertisement": (46, 204, 113) if color else 6,
         "additional": (52, 73, 94) if color else 7,
     }
+
+    if not withheadings:
+        # treat headings as text
+        colormap["heading"] = colormap["text"]
+        colormap["separator"] = (155, 89, 182) if color else 4
+        colormap["advertisement"] = (46, 204, 113) if color else 5
+        colormap["additional"] = (52, 73, 94) if color else 6
 
     # Read the exported data
     with open(input, "r") as f:
@@ -630,9 +643,15 @@ def ecpo_data_to_labelstudio_cli(
     default=None,
     help="Comma-separated list of task IDs to consider. If not set, all tasks are considered.",
 )
+@click.option(
+    "--withheadings/--no-withheadings",
+    type=bool,
+    default=True,
+    help="Whether to treat headings as a separate class. If disabled, headings are treated as text.",
+)
 @click.command
 def labelstudio_to_png_cli(
-    input, output, color, overwrite, buffer_size, considered_ids
+    input, output, color, overwrite, buffer_size, considered_ids, withheadings
 ):
     output.mkdir(exist_ok=True, parents=True)
     if considered_ids is not None:
@@ -644,6 +663,7 @@ def labelstudio_to_png_cli(
         overwrite,
         artboundary_buffer_size=buffer_size,
         considered_ids=considered_ids,
+        withheadings=withheadings,
     )
 
 

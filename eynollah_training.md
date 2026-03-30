@@ -400,11 +400,13 @@ transformer_patchsize_y: 2
 * GPU0
 * Memory usage: 64.45 GB
 * GPU-Util: max 99%
-* Training time: x:xx:xxx
-* Training loss: x.xx
-* Training accuracy: x.xxx
-* Inference results: [heiBOX folder]()
-* Trained model: [heiBOX link]()
+* Training time: 19:20:51
+* Training loss: 0.0713
+* Training accuracy: 0.9832
+* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/ff2b327edc534dca98c8/)
+* Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/9c8012a7a25546ceab1c/)
 
 #### First impression
-TBU.
+* On Jingbao test data, the trained model (XL size) does not improve the result significantly
+* On non-Jingbao sample images, interestingly, the trained model (XL size) seems to detect images better than the previous models. However, the overall separation of text blocks is still not good.
+* Further evaluation is needed with concrete metrics.
