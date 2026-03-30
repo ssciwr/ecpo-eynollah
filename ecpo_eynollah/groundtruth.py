@@ -350,7 +350,8 @@ def labelstudio_to_png(
         data = json.load(f)
 
     print(
-        f"Creating PNGs with {artboundary_buffer_size} pixels buffer size."
+        f"Creating PNGs with {artboundary_buffer_size} pixels buffer size. "
+        f"Color: {color}. Overwrite: {overwrite}. With headings: {withheadings}. "
         f"Considering IDs: {considered_ids}"
     )
 
@@ -508,13 +509,15 @@ def labelstudio_to_png(
         for label in label_priority:
             for annotation in task["label"]:
                 # record rotated rectangles for debugging
-                if "rotation" in annotation and annotation["rotation"] != 0:
+                if ("rotation" in annotation) and (
+                    (annotation["rotation"] != 0) and (annotation["rotation"] != 360)
+                ):
                     # # debug
                     # print(
                     #     f"Found rotated rectangle in file {task['name']}. Rotation angle: {annotation['rotation']} degrees."
                     # )
                     num_rotated_rectangles += 1
-                    ro_rec_files.append(f"{task["name"]}-{annotation["labels"][0]}")
+                    ro_rec_files.append(f"{task['name']}-{annotation['labels'][0]}")
                 # draw artifical boundaries first
                 if label == artificial_boundary and artboundary_buffer_size > 0:
                     _draw_annotation(
