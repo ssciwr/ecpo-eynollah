@@ -410,3 +410,58 @@ transformer_patchsize_y: 2
 * On Jingbao test data, the trained model (XL size) does not improve the result significantly
 * On non-Jingbao sample images, interestingly, the trained model (XL size) seems to detect images better than the previous models. However, the overall separation of text blocks is still not good.
 * Further evaluation is needed with concrete metrics.
+
+
+
+### Training with artificial boundaries, 10 pixels buffering, no heading class, ads separation
+
+Images with ground truth are separated into ads-heavy and text-heavy groups. There are two training process with the same configuration for each group.
+```
+Total ads-heavy files: 20
+Total text-heavy files: 62
+
+## For ads-heavy group
+Total labeled files: 20
+Total groups: 2
+Group sizes (without dup files):
+('1920', '1-4'): 10
+('1930', '1-4'): 10
+Total dup files to process: 0
+
+## For text-heavy group
+Total labeled files: 62
+Total groups: 6
+Group sizes (without dup files):
+('1939', '6-7'): 10
+('1930', '2-3'): 10
+('1939', '2-3'): 11
+('1939', '1-4'): 10
+('1920', '2-3'): 10
+('1939', '5-8'): 11
+Total dup files to process: 0
+```
+
+#### Scaling and binarization (with pre-train option) - text-heavy group
+* Run on `compgpu11`
+* GPU3
+* Memory usage: 33.04 GB
+* GPU-Util: max 99% (but not often)
+* Training time: TBU.
+* Training loss: TBU.
+* Training accuracy: TBU.
+* Inference results: [heiBOX folder]()
+* Trained model: [heiBOX link]()
+
+#### Scaling and binarization (with pre-train option) - ads-heavy group
+* Run on `compgpu11`
+* GPU2
+* Memory usage: 33.04 GB
+* GPU-Util: max 99% (but not often)
+* Training time: TBU.
+* Training loss: TBU.
+* Training accuracy: TBU.
+* Inference results: [heiBOX folder]()
+* Trained model: [heiBOX link]()
+
+#### First impression
+TBU.
