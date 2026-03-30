@@ -75,4 +75,12 @@ prepare-data \
     $ADS_FLAG \
     --out-dir "$ROOT_DIR/data"
 
+# prepare output folders in case of ads separation
+if [ "$ADS_SEPARATION" = true ]; then
+  mkdir -p "$ROOT_DIR/out/ads-heavy"
+  mkdir -p "$ROOT_DIR/out/text-heavy"
+else
+  mkdir -p "$ROOT_DIR/out/mixed"
+fi
+
 echo "Data preparation complete. Data is in $ROOT_DIR/data"
