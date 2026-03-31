@@ -446,22 +446,23 @@ Total dup files to process: 0
 * GPU3
 * Memory usage: 33.04 GB
 * GPU-Util: max 99% (but not often)
-* Training time: TBU.
-* Training loss: TBU.
-* Training accuracy: TBU.
-* Inference results: [heiBOX folder]()
-* Trained model: [heiBOX link]()
+* Training time: 19:12:27
+* Training loss: 0.0461
+* Training accuracy: 0.9830
+* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/9f545906c67e42a09825/)
+* Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/9e8790e6c7104c50ae2e/)
 
 #### Scaling and binarization (with pre-train option) - ads-heavy group
 * Run on `compgpu11`
 * GPU2
 * Memory usage: 33.04 GB
 * GPU-Util: max 99% (but not often)
-* Training time: TBU.
-* Training loss: TBU.
-* Training accuracy: TBU.
-* Inference results: [heiBOX folder]()
-* Trained model: [heiBOX link]()
+* Training time: 8:21:26
+* Training loss: 0.1053
+* Training accuracy: 0.9866
+* Inference results: [heiBOX folder](https://heibox.uni-heidelberg.de/d/9f7341e51a9043808b04/)
+* Trained model: [heiBOX link](https://heibox.uni-heidelberg.de/f/9a24ea4081ce45de81d1/)
 
 #### First impression
-TBU.
+* Inference results of the ads-heavy model underperfoms the previous models. This seems due to the lack of training data (only 20 images in total for training and evaluation).
+* Need to check if the text-heavy model outperforms the previous models before deciding whether separated training is needed or not.
