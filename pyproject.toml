@@ -35,12 +35,6 @@ dependencies = [
     "shapely",
 ]
 
-[project.optional-dependencies]
-tests = [
-    "pytest",
-    "pytest-cov",
-]
-
 # Command line scripts installed as part of the installation
 [project.scripts]
 ecpodata2labelstudio = "ecpo_eynollah.groundtruth:ecpo_data_to_labelstudio_cli"

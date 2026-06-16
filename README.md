@@ -1,15 +1,8 @@
 # Welcome to ecpo-eynollah
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ssciwr/ecpo-eynollah/ci.yml?branch=main)](https://github.com/ssciwr/ecpo-eynollah/actions/workflows/ci.yml)
 
-## Installation
-
-The Python package `ecpo_eynollah` can be installed from PyPI:
-
-```
-python -m pip install ecpo_eynollah
-```
+This repository contains the required code and documentation for the SSC Open Call project to apply [Eynollah Layout segmentation](https://github.com/qurator-spk/eynollah) to [ECPO corpora](https://ecpo.cats.uni-heidelberg.de/ecpo/). It contains the documentation of our training runs with Eynollah, as well as the code required to massage the existing ground truth into Eynollah-compatible form.
 
 ## Development installation
 
@@ -19,13 +12,7 @@ the following editable installation from this repository:
 ```
 git clone git@github.com:ssciwr/ecpo-eynollah.git
 cd ecpo-eynollah
-python -m pip install --editable .[tests]
-```
-
-Having done so, the test suite can be run using `pytest`:
-
-```
-python -m pytest
+python -m pip install --editable .
 ```
 
 ## Acknowledgments
