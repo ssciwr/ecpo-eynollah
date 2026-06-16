@@ -32,6 +32,7 @@ dependencies = [
     "requests",
     "svgelements",
     "tqdm",
+    "shapely",
 ]
 
 [project.optional-dependencies]
@@ -44,6 +45,10 @@ tests = [
 [project.scripts]
 ecpodata2labelstudio = "ecpo_eynollah.groundtruth:ecpo_data_to_labelstudio_cli"
 labelstudio2png = "ecpo_eynollah.groundtruth:labelstudio_to_png_cli"
+prepare-data = "ecpo_eynollah.prepare_data:prepare_data_cli"
+download-test-data = "ecpo_eynollah.download_test_data:download_test_data_cli"
+download-ls-imgs = "ecpo_eynollah.download_ls_imgs:download_ls_imgs_cli"
+download-non-jingbao = "ecpo_eynollah.download_non_jingbao:download_non_jingbao_cli"
 
 # The following section contains setuptools-specific configuration
 # options. For a full reference of available options, check the overview
